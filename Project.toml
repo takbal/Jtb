@@ -1,9 +1,4 @@
 name = "Jtb"
 uuid = "3b8eada0-d907-428f-81b4-847e85add4df"
 authors = ["Balint Takacs <takbal@gmail.com>"]
-version = "0.1.0"
-
-[deps]
-Atom = "c52e3926-4ff0-5f6e-af25-54175e0327b1"
-Juno = "e5e0dc1b-0480-54bc-9374-aad01c23163d"
-Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+version = "0.1.1"
