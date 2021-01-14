@@ -1,0 +1,11 @@
+*.log
+
+# eclipse
+.project
+.pydevproject
+
+# PyCharm
+.idea
+
+# vscode
+.vscode
