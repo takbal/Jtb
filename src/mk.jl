@@ -148,7 +148,7 @@ function generate_new_version(inc_ver_type::AbstractString, project_name::Abstra
     end
 
     println("pushing registry to remote server ...")
-    with_working_directory( normalpath(ENV["HOME"], ".julia", "registries", registry_name) ) do
+    with_working_directory( normpath(ENV["HOME"], ".julia", "registries", registry_name) ) do
         run(`git push`)
     end
 
