@@ -25,10 +25,10 @@ using Pkg
 ################### static params start
 
 # these are the packages that will got temporarily removed before making a release, so they are not going to be a dependency
-development_packages = ["Revise", "Atom", "Juno", "StaticLint", "PkgAuthentication"]
+development_packages = ["Revise", "Atom", "Juno", "StaticLint", "PkgAuthentication", "CodeTools", "MethodAnalysis", "JuliaInterpreter"]
 
 # automatically added packages for a new project
-auto_packages = ["Revise", "Atom", "Juno"]
+auto_packages = ["Revise", "Atom", "Juno", "MethodAnalysis", "JuliaInterpreter"]
 
 # this is a Julia environment where the registry is going to added from. It must have LocalRegistry added as a dependency and
 # register_package.jl in its root with the content:
