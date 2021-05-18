@@ -24,6 +24,6 @@ include("text.jl")
 export boldify, italicify
 
 include("julia.jl")
-export typeinfo, compilemode
+export typeinfo, compilemode, mymethods
 
 end # module
