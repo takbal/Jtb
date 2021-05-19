@@ -44,7 +44,8 @@ function my_show_method(io::IO, m::Method)
     print(io, " in ", m.module)
     if line > 0
         file, line = Base.updated_methodloc(m)
-        print(io, " at ", Base.find_source_file(file), ":", line)
+        # this is the only change in this function:
+        print(io, " at ", normpath(Base.find_source_file(file)), ":", line)
     end
 end
 
@@ -53,7 +54,7 @@ end
 
 stolen and changed from methodshow.jl to have the file printed when it is part of stdlib
 """
-function my_show_method_table(ms::Base.MethodList, io::IO=stdout, max::Int=-1, header::Bool=true)
+function my_show_method_table(io::IO, ms::Base.MethodList, max::Int=-1, header::Bool=true)
     mt = ms.mt
     name = mt.name
     hasname = isdefined(mt.module, name) &&
@@ -70,6 +71,7 @@ function my_show_method_table(ms::Base.MethodList, io::IO=stdout, max::Int=-1, h
             n += 1
             println(io)
             print(io, "[$n] ")
+            # this is the only change in this function:
             my_show_method(io, meth)
             file, line = Base.updated_methodloc(meth)
             push!(Base.LAST_SHOWN_LINE_INFOS, (string(file), line))
@@ -138,4 +140,4 @@ function compilemode(x...)
 
 end
 
-mymethods(x) = my_show_method_table(methods(x))
+meth(x) = my_show_method_table(stdout, methods(x))
