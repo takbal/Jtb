@@ -322,7 +322,8 @@ function sync_to(dims2keys::AbstractDict, args...; fillval=NaN)
 end
 
 """
-    sync(K1, K2...; type=:inner, dims::Union{AbstractArray{Symbol,1},Nothing}=nothing, fillval=NaN)
+    sync(K1, K2...; type=:inner, dims::Union{AbstractArray{Symbol,1},Nothing}=nothing,
+         fillval=NaN, keys_only::Bool=false)
 
 Sync KeyedArrays to each other in the specified dimensions. Returns the tuple of the modified KeyedArrays.
 
@@ -342,6 +343,7 @@ Parameters:
     type        : if :inner, target intersect of keys, if :outer, take union
     dims        : the dimension(s) to do the syncing in. If nothing, sync all dimensions.
     fillval     : use this value to fill newly added entries if necessary.
+    keys_only   : if true, do not sync arrays, just return the unified key lists
 
 Examples:
 
@@ -360,7 +362,7 @@ Examples:
 """
 function sync(args...; type=:inner,
             dims::Union{Symbol,Tuple,AbstractArray{Symbol,1},Nothing}=nothing,
-            fillval=NaN)
+            fillval=NaN, keys_only::Bool=false)
 
     @assert length(args) > 1 "you need to specify more then one KeyedArrays"
 
@@ -388,6 +390,10 @@ function sync(args...; type=:inner,
         else
             @error "unknown sync type: $type"
         end
+    end
+
+    if keys_only
+        return d2k
     end
 
     sync_to(d2k, args...; fillval)
