@@ -328,7 +328,7 @@ Sync KeyedArrays simultaneously to the keys of the specified KeyedArray. Returns
 of the modified KeyedArrays. Uses the sync_to() with AbstractDict internally; see that method
 for detailed usage.
 """
-sync_to(to_karray::KeyedArray, args...; fillval=NaN) = sync_to(Dict(dimnames(to_karray), axiskeys(to_karray)), args...; fillval)
+sync_to(to_karray::KeyedArray, args...; fillval=NaN) = sync_to(Dict(zip(dimnames(to_karray), axiskeys(to_karray))), args...; fillval)
 
 """
     sync(K1, K2...; type=:inner, dims::Union{AbstractArray{Symbol,1},Nothing}=nothing,
