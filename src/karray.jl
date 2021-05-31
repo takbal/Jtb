@@ -140,18 +140,29 @@ function convert_eltype(eltype::Type, K::KeyedArray; kwargs...)::KeyedArray
 end
 
 """
-    extdim(K::KeyedArray, dimname, label)::KeyedArray
+    extdim(K::KeyedArray, dimname=:_, label=nothing; atdim=nothing::KeyedArray
 
 Extend the passed KeyedArray with an extra dimension. Must supply a dimension name and a label
 array for the existing data in the new dimension, like Kext = extdim(K, :foo, ["bar"]).
 Returns the extended KeyedArray.
 
+You can supply an unkeyed dimension by specifying :_ as dimname and 'nothing' as keys (the default).
+
+The extended dimension will be the last by default. Specify the 'atdim' keyword to tell the index
+of the new dimension. Later dimensions are shifted in index by one.
+
 For the reverse operation, use dropdims(K, dims=:dimname).
 """
-function extdim(K::KeyedArray, dimname::Symbol, label)::KeyedArray
+function extdim(K::KeyedArray, dimname::Symbol=:_, label=nothing; atdim=nothing)::KeyedArray
     arraykeys = OrderedDict{Any,Any}( dimnames(K)[i] => axiskeys(K)[i] for i in 1:ndims(K))
     arraykeys[dimname] = label
-    wrapdims( reshape( parent(parent(K)), (size(K)..., 1) ); arraykeys... )
+    out = wrapdims( reshape( parent(parent(K)), (size(K)..., 1) ); arraykeys... )
+
+    if !isnothing(atdim)
+        out = permutedims(out, [collect(1:atdim-1) ; ndims(out) ; collect(atdim:ndims(out)-1)])
+    end
+
+    return out
 end
 
 """
