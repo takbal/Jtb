@@ -111,7 +111,11 @@ function typeinfo(x, st::Bool=false)
 
     println("   subtypes: ", subtypes(x))
 
-    println("methodswith:")
+    println("\nconstructors:\n")
+
+    meth(x)
+
+    println("\n\nmethodswith:\n")
     ms = methodswith(x; supertypes=st)
     for m in ms
         my_show_method(stdout, m)
