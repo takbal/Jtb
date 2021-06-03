@@ -24,6 +24,87 @@ function nancumsum!(B, A; kwargs...)
 end
 
 """
+    cumsum_ignorenans(A; kwargs...)
+
+Similar to cumsum but ignores NaNs in A.
+"""
+function cumsum_ignorenans(A; kwargs...)
+    tmp = deepcopy(A)
+    nans = broadcast(isnan, tmp)
+    tmp[nans] .= 0
+    out = similar(tmp)
+    cumsum!(out, tmp; kwargs...)
+    out[nans] .= NaN
+    return out    
+end
+
+"""
+    cumsum_ignorenans!(B, A; kwargs...)
+
+Similar to cumsum! but ignores NaNs in A.
+Warning: changes A as well.
+"""
+function cumsum_ignorenans!(B, A; kwargs...)
+    nans = broadcast(isnan, A)
+    A[nans] .= 0
+    cumsum!(B, A; kwargs...)
+    B[nans] .= NaN
+    return B
+end
+
+"""
+    nancumprod(A; kwargs...)
+
+Similar to cumprod but changes NaNs to 1 in A before.
+"""
+function nancumprod(A; kwargs...)
+    tmp = deepcopy(A)
+    tmp[ broadcast(isnan, tmp) ] .= 1
+    out = similar(tmp)
+    cumprod!(out, tmp; kwargs...)
+end
+
+"""
+    nancumprod!(B, A; kwargs...)
+
+Similar to cumprod! but changes NaNs to 1 in A before.
+Warning: changes A as well.
+"""
+function nancumprod!(B, A; kwargs...)
+    A[ broadcast(isnan, A) ] .= 1
+    cumprod!(B, A; kwargs...)
+end
+
+"""
+    cumprod_ignorenans(A; kwargs...)
+
+Similar to cumprod but ignores NaNs in A.
+"""
+function cumprod_ignorenans(A; kwargs...)
+    tmp = deepcopy(A)
+    nans = broadcast(isnan, tmp)
+    tmp[nans] .= 1
+    out = similar(tmp)
+    cumprod!(out, tmp; kwargs...)
+    out[nans] .= NaN
+    return out
+end
+
+"""
+    cumprod_ignorenans!(B, A; kwargs...)
+
+Similar to cumprod! but ignores NaNs in A.
+Warning: changes A as well.
+"""
+function cumprod_ignorenans!(B, A; kwargs...)
+    nans = broadcast(isnan, A)
+    A[nans] .= 1
+    cumprod!(B, A; kwargs...)
+    B[nans] .= NaN
+    return B
+end
+
+"""
     ismissingornan(x)
 
 returns if x is missing or x is nan

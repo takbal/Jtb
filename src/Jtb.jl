@@ -9,7 +9,8 @@ export add_file_logger, withtrace, BetterFileLogger
 
 include("math.jl")
 export nancumsum, nancumsum!, ismissingornan, nanfunc, nanmean, nanstd, nanvar, nanminimum,
-       nanmaximum, nanmin, nanmax
+       nanmaximum, nanmin, nanmax, nancumprod, nancumprod!, cumsum_ignorenans, cumsum_ignorenans!,
+       cumprod_ignorenans, cumprod_ignorenans!
 
 include("datetime.jl")
 export get_interval_indices
