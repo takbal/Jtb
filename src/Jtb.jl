@@ -1,7 +1,10 @@
 module Jtb
 
+include("array.jl")
+export allslice, anyslice, propfill!
+
 include("karray.jl")
-export convert_eltype, extdim, unwrap, sync, sync_to, alldimsbut, convert_kc, allslice, anyslice
+export convert_eltype, extdim, unwrap, sync, sync_to, alldimsbut, convert_kc
 export KeyedVector, KeyedMatrix, Keyed3D
 
 include("logging.jl")
