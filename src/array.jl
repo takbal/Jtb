@@ -1,18 +1,18 @@
 """
-    anyslice(p, A::AbstractArray, dim::Integer)
+    anyslice(p, A::AbstractArray, dim)
 
 Returns a BitVector storing the output of any(p, slice[:]) for each slice in dim, keeping
 the selected dim. This is in contrast to any() that collapses the selected dim(s) to 1.
 """
-anyslice(p, A::AbstractArray; dim::Integer) = BitArray( any(p, x) for x in eachslice(A; dims=dim) )
+anyslice(p, A::AbstractArray; dim) = BitArray( any(p, x) for x in eachslice(A; dims=dim) )
 
 """
-    allslice(p, A::AbstractArray, dim::Integer)
+    allslice(p, A::AbstractArray, dim)
 
 Returns a BitVector storing the output of all(p, slice[:]) for each slice in dim, keeping
 the selected dim. This is in contrast to all() that collapses the selected dim(s) to 1.
 """
-allslice(p, A::AbstractArray; dim::Integer) = BitArray( all(p, x) for x in eachslice(A; dims=dim) )
+allslice(p, A::AbstractArray; dim) = BitArray( all(p, x) for x in eachslice(A; dims=dim) )
 
 """
     propfill!(p, A::AbstractArray; dim, backwards::Bool=false, defvalue=NaN)
@@ -33,7 +33,7 @@ propfill!( isnan, [ NaN NaN ; 1 2 ; NaN NaN ; 3 4 ]; dim=1 )
    3.0    4.0
 
 """
-function propfill!(p, A::AbstractArray; dim::Integer, backwards::Bool=false, defvalue=NaN)
+function propfill!(p, A::AbstractArray; dim, backwards::Bool=false, defvalue=NaN)
 
     # we cannot use eachslice() due to backwards
 
