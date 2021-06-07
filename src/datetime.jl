@@ -11,7 +11,7 @@ function get_interval_indices(data::AbstractArray{<:TimeType}, Period::DataType)
 
     @assert issorted(data) "data is not sorted"
 
-    last_day_indices = findall( abs.(diff(Period.(data))) .> Period(0) )
+    last_day_indices = findall( abs.(Base.diff(Period.(data))) .> Period(0) )
     first_day_indices = [ 1 ; deepcopy(last_day_indices) .+ 1 ]
     push!(last_day_indices, length(data))
 
