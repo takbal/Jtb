@@ -443,3 +443,19 @@ convert_kc(K::KeyedArray, container_type::Type=UniqueVector)::KeyedArray =
 Return index of all dimensions except the specified one (which can be a Symbol).
 """
 alldimsbut(K::KeyedArray, querydim) = setdiff( 1:ndims(K), dim(parent(K), querydim) )
+
+"""
+    diff(K::KeyedArray; dims, removefirst::Bool=true)
+
+A diff() specialization that works for KeyedArrays and named dimensions.
+if 'removefirst' is true, the first key is removed in the dimension, otherwise the last.
+"""
+function Base.diff(K::KeyedArray; dims, removefirst::Bool=true)
+
+    range = removefirst ? (2:size(K, dims)) : (1:size(K,dims)-1)
+    out = similar(selectdim(K, dims, range) )
+    out[:] = Base.diff(unwrap(K); dims=NamedDims.dim(parent(K),dims))
+
+    return out
+
+end
