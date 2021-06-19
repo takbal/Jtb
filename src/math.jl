@@ -1,4 +1,4 @@
-using Statistics
+using Statistics, DataStructures
 
 """
     nancumsum(A; kwargs...)
@@ -35,7 +35,7 @@ function cumsum_ignorenans(A; kwargs...)
     out = similar(tmp)
     cumsum!(out, tmp; kwargs...)
     out[nans] .= NaN
-    return out    
+    return out
 end
 
 """
@@ -148,9 +148,48 @@ nanmaximum(A::AbstractArray; kwargs...) = nanfunc(maximum, A; kwargs...)
 returns max(x,y), but ignores NaNs unless both x and y are NaN.
 """
 nanmax(x,y) = isnan(x) ? y : ( isnan(y) ? x : max(x,y) )
+
 """
     nanmin(x,y)
 
 returns min(x,y), but ignores NaNs unless both x and y are NaN.
 """
 nanmin(x,y) = isnan(x) ? y : ( isnan(y) ? x : min(x,y) )
+
+"""
+    map_lastn(f, v::AbstractVector, N::Int; default=NaN)
+
+For all index i in v, apply f to the vector formed from the previous N not-nan and
+non-missing value of v up to index i-1, and store the result at index i. If there
+are no N values yet collected, use the default value. The resulting vector has
+the same size as v.
+"""
+function map_lastn(f, v::AbstractVector, N::Int; default=NaN)
+
+    out = similar(v)
+
+    # a slightly lower allocation, same speed
+    dqueue = Deque{eltype(v)}()
+    # dqueue = fill(default, (0,))
+    
+    filled = false
+
+    for (i,x) in enumerate(v)
+        if !filled
+            filled = length(dqueue) == N
+        end
+        if filled
+            out[i] = f(dqueue)
+        else
+            out[i] = default
+        end
+        if !ismissing(x) && !isnan(x)
+            if filled
+                popfirst!(dqueue)
+            end
+            push!(dqueue, x)
+        end
+    end
+
+    return out
+end
