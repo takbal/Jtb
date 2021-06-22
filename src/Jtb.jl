@@ -11,9 +11,10 @@ include("logging.jl")
 export add_file_logger, withtrace, BetterFileLogger
 
 include("math.jl")
-export nancumsum, nancumsum!, ismissingornan, nanfunc, nanmean, nanstd, nanvar, nanminimum,
-       nanmaximum, nanmin, nanmax, nancumprod, nancumprod!, cumsum_ignorenans, cumsum_ignorenans!,
-       cumprod_ignorenans, cumprod_ignorenans!, map_lastn
+export nancumsum, nancumsum!, ismissingornan, ismissingornanorzero, nanfunc, nanmean, nanstd,
+       nanvar, nanminimum, nanmaximum, nanmin, nanmax, nancumprod, nancumprod!,
+       cumsum_ignorenans, cumsum_ignorenans!, cumprod_ignorenans, cumprod_ignorenans!, map_lastn,
+       groupfunc
 
 include("datetime.jl")
 export get_interval_indices
@@ -29,5 +30,8 @@ export boldify, italicify
 
 include("julia.jl")
 export typeinfo, compilemode, meth
+
+include("stats.jl")
+export fractiles
 
 end # module

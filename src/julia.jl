@@ -144,4 +144,9 @@ function compilemode(x...)
 
 end
 
+"""
+    meth(x)
+
+alternative to methods(x) that always show the file location
+"""
 meth(x) = my_show_method_table(stdout, methods(x))

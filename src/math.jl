@@ -111,6 +111,12 @@ returns if x is missing or x is nan
 """
 ismissingornan(x) = ismissing(x) || isnan(x)
 
+"""
+    ismissingornanorzero(x)
+
+returns if x is missing or x is nan or x is zero
+"""
+ismissingornanorzero(x) = ismissing(x) || isnan(x) || iszero(x)
 
 """
     nanfunc(f::Function, A::AbstractArray; dims=:)
@@ -170,8 +176,8 @@ function map_lastn(f, v::AbstractVector, N::Int; default=NaN)
 
     # a slightly lower allocation, same speed
     dqueue = Deque{eltype(v)}()
-    # dqueue = fill(default, (0,))
-    
+    # dqueue = Vector{eltype(v)}()
+
     filled = false
 
     for (i,x) in enumerate(v)
@@ -192,4 +198,31 @@ function map_lastn(f, v::AbstractVector, N::Int; default=NaN)
     end
 
     return out
+end
+
+"""
+    groupfunc(f, X, groups::AbstractVector[])
+
+apply f to groups in X defined by index lists, then concatenate results.
+
+Input:
+
+    f: the function to apply to indexed subsets of X
+
+    X: data
+
+    groups: collection of vectors of indices, each defining a group
+
+Outputs a length(groups) sized vector.
+"""
+function groupfunc(f, X, groups::AbstractVector)
+
+    out = Vector(undef, length(groups))
+
+    for (idx,g) in enumerate(groups)
+        out[idx] = f(X[g])
+    end
+
+    return out
+
 end
