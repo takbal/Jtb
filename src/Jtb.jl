@@ -23,10 +23,10 @@ include("process.jl")
 export is_pid_alive
 
 include("plots.jl")
-export imagesc, unfocus, add_keypress_handler, maximize
+export imagesc, unfocus, add_keypress_handler, maximize, trace_fractile, trace_density
 
 include("text.jl")
-export boldify, italicify
+export boldify, italicify, printjson
 
 include("julia.jl")
 export typeinfo, compilemode, meth
