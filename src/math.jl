@@ -123,7 +123,7 @@ ismissingornanorzero(x) = ismissing(x) || isnan(x) || iszero(x)
 
 apply f to A, ignoring NaNs. Works with mean, var and others.
 
-Specializations: [`nanmean`](@ref), [`nanstd`](@ref), [`nanvar`](@ref), [`nanminimum`](@ref), [`nanmaximum`](@ref)
+Specializations: [`nanmean`](@ref), [`nanstd`](@ref), [`nanvar`](@ref), [`nanminimum`](@ref), [`nanmaximum`](@ref), [`nansum`](@ref), [`nanprod`](@ref)
 """
 nanfunc(f::Function, A::AbstractArray; dims=:) = _nanfunc(f, A, dims)
 function _nanfunc(f::Function, A::AbstractArray, ::Colon)
@@ -137,6 +137,10 @@ function _nanfunc(f::Function, A::AbstractArray, ::Colon)
 end
 _nanfunc(f::Function, A::AbstractArray, dims) = mapslices(a->_nanfunc(f,a,:), A; dims)
 
+@doc (@doc nanfunc)
+nansum(A::AbstractArray; kwargs...) = nanfunc(sum, A; kwargs...)
+@doc (@doc nanfunc)
+nanprod(A::AbstractArray; kwargs...) = nanfunc(prod, A; kwargs...)
 @doc (@doc nanfunc)
 nanmean(A::AbstractArray; kwargs...) = nanfunc(mean, A; kwargs...)
 @doc (@doc nanfunc)

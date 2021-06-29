@@ -12,7 +12,7 @@ export add_file_logger, withtrace, BetterFileLogger
 
 include("math.jl")
 export nancumsum, nancumsum!, ismissingornan, ismissingornanorzero, nanfunc, nanmean, nanstd,
-       nanvar, nanminimum, nanmaximum, nanmin, nanmax, nancumprod, nancumprod!,
+       nanvar, nanminimum, nanmaximum, nanmin, nanmax, nancumprod, nancumprod!, nansum, nanprod,
        cumsum_ignorenans, cumsum_ignorenans!, cumprod_ignorenans, cumprod_ignorenans!, map_lastn,
        groupfunc
 
