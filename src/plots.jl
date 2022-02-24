@@ -60,29 +60,28 @@ end
 PlotlyJS.Plot specialization for AxisKeys.KeyedArrays; try to fill X axis from keys automatically
 In case of 2D arrays, also fill scatter names and y label.
 """
-function PlotlyJS.Plot(data::KeyedArray, lo::Layout = Layout();
-                style::Style=PlotlyBase.CURRENT_STYLE[], kwargs...)
+function PlotlyJS.Plot(data::KeyedArray, lo::Layout = Layout(); kwargs...)
 
     lo, datakeys = _prepare_plotting(lo, data)
 
     if ndims(data) == 1
         trace = GenericTrace(datakeys[1], parent(parent(data)); kwargs...)
-        PlotlyJS.Plot(trace, lo, style=style)
+        PlotlyJS.Plot(trace, lo)
     elseif ndims(data) == 2
 
         traces = [ GenericTrace(datakeys[1], x; name = datakeys[2][idx], kwargs...)
                    for (idx,x) in enumerate(eachslice(data, dims=2)) ]
-        return PlotlyJS.Plot(traces, lo, style=style)
+        return PlotlyJS.Plot(traces, lo)
 
     else
         # try to do something, whatever happens
-        return PlotlyJS.Plot(data, lo, style=style)
+        return PlotlyJS.Plot(data, lo)
     end
 
 end
 
 """
-    imagesc(data::KeyedArray; kwargs...)
+    imagesc(data::AbstractMatrix; kwargs...)
 
 Show matrix as a heatmap (a'la MATLAB's imagesc()).
 
@@ -90,23 +89,21 @@ For AxisKeys.KeyedArrays, try to fill X/Y axis from keys and labels.
 
 Properly shows BitArrays.
 """
-function imagesc(data::AbstractMatrix, lo::Layout = Layout();
-                 style::Style=PlotlyBase.CURRENT_STYLE[], kwargs...)
-
-    if eltype(data) <: Bool
-        convdata = UInt8.(unwrap(data))
-    else
-        convdata = unwrap(data)
-    end
+function imagesc(data::AbstractMatrix, lo::Layout = Layout(); kwargs...)
 
     if typeof(data) <: KeyedArray
-        lo, datakeys = _prepare_plotting(lo, data)
-        trace = heatmap(x = datakeys[1], y = datakeys[2], z = convdata, kwargs...)
+        if eltype(data) <: Bool
+            convdata = UInt8.(unwrap(data))
+        else
+            convdata = unwrap(data)
+        end
+            lo, datakeys = _prepare_plotting(lo, data)
+        trace = heatmap(;x = datakeys[1], y = datakeys[2], z = convdata, kwargs...)
     else
-        trace = heatmap(z = convdata, kwargs...)
+        trace = heatmap(;z = data, kwargs...)
     end
 
-    return plot(trace, lo, style=style)
+    return plot(trace, lo)
 
 end
 
@@ -118,8 +115,8 @@ end
 Show the window of p unfocused. Useful if waiting for key press of a plot, and the plot steals focus.
 """
 function unfocus(p::PlotlyJS.SyncPlot)
-    Blink.AtomShell.@dot p.window minimize()
-    Blink.AtomShell.@dot p.window showInactive()
+    Blink.AtomShell.dot(p.window,:(this.minimize()))
+    Blink.AtomShell.dot(p.window,:(this.showInactive()))
 end
 
 """
@@ -128,7 +125,7 @@ end
 Show the window maximized.
 """
 function maximize(p::PlotlyJS.SyncPlot)
-    Blink.AtomShell.@dot p.window maximize()
+    Blink.AtomShell.dot(p.window,:(this.maximize()))
 end
 
 """

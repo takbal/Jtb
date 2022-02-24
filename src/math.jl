@@ -230,3 +230,30 @@ function groupfunc(f, X, groups::AbstractVector)
     return out
 
 end
+
+"""
+    fit_symmetric_parabola(X::AbstractArray, Y::AbstractArray)
+
+OLS fit to a set of (x_i, y_i) points of a parabolic curve constrained to y = y0 + αx^2.
+Returns the y0 and α parameters.
+"""
+function fit_symmetric_parabola(X::AbstractArray, Y::AbstractArray)
+
+    @assert length(X) == length(Y) "mismatch in X and Y size"
+    @assert length(X) > 1 "need at least two points"
+
+    A = sum(X .^ 2)
+    B = sum(Y)
+    C = sum(X .^ 4)
+    D = sum(Y .* (X .^ 2))
+    N = length(X)
+    det = N*C - A^2
+
+    @assert det != 0 "undefined solution"
+
+    y0 = (C*B - A*D) / det
+    alpha = (N*D - A*B) / det
+
+    return y0, alpha
+
+end

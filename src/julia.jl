@@ -8,36 +8,22 @@ stolen and changed from methodshow.jl to have the file printed when it is part o
 function my_show_method(io::IO, m::Method)
     tv, decls, file, line = Base.arg_decl_parts(m)
     sig = Base.unwrap_unionall(m.sig)
-    ft0 = sig.parameters[1]
-    ft = Base.unwrap_unionall(ft0)
-    d1 = decls[1]
     if sig === Tuple
         # Builtin
         print(io, m.name, "(...) in ", m.module)
         return
     end
-    if ft <: Function && isa(ft, DataType) &&
-            isdefined(ft.name.module, ft.name.mt.name) &&
-                # TODO: more accurate test? (tn.name === "#" name)
-            ft0 === typeof(getfield(ft.name.module, ft.name.mt.name))
-        print(io, ft.name.mt.name)
-    elseif isa(ft, DataType) && ft.name === Type.body.name
-        f = ft.parameters[1]
-        if isa(f, DataType) && isempty(f.parameters)
-            print(io, f)
-        else
-            print(io, "(", d1[1], "::", d1[2], ")")
-        end
-    else
-        print(io, "(", d1[1], "::", d1[2], ")")
-    end
-    print(io, "(")
-    join(io, String[isempty(d[2]) ? d[1] : d[1]*"::"*d[2] for d in decls[2:end]],
-                 ", ", ", ")
+    print(io, decls[1][2], "(")
+    join(
+        io,
+        String[isempty(d[2]) ? d[1] : string(d[1], "::", d[2]) for d in decls[2:end]],
+        ", ",
+        ", ",
+    )
     kwargs = Base.kwarg_decl(m)
     if !isempty(kwargs)
         print(io, "; ")
-        join(io, kwargs, ", ", ", ")
+        join(io, map(Base.sym_to_string, kwargs), ", ", ", ")
     end
     print(io, ")")
     Base.show_method_params(io, tv)
@@ -45,12 +31,19 @@ function my_show_method(io::IO, m::Method)
     if line > 0
         file, line = Base.updated_methodloc(m)
         # this is the only change in this function:
-        print(io, " at ", normpath(Base.find_source_file(file)), ":", line)
+        # print(io, " at ", file, ":", line) replaced by:
+        fname = normpath(Base.find_source_file(file));
+        if isnothing(fname)
+            print(io, " at ", file, ":", line);
+        else
+            print(io, " at ", normpath(Base.find_source_file(file)), ":", line)
+        end
     end
 end
 
+
 """
-    my_show_method(io::IO, m::Method)
+    my_show_method_table(io::IO, ms::Base.MethodList, max::Int=-1, header::Bool=true)
 
 stolen and changed from methodshow.jl to have the file printed when it is part of stdlib
 """
@@ -65,16 +58,21 @@ function my_show_method_table(io::IO, ms::Base.MethodList, max::Int=-1, header::
     n = rest = 0
     local last
 
-    resize!(Base.LAST_SHOWN_LINE_INFOS, 0)
+    last_shown_line_infos = get(io, :last_shown_line_infos, nothing)
+    last_shown_line_infos === nothing || empty!(last_shown_line_infos)
+
     for meth in ms
         if max==-1 || n<max
             n += 1
             println(io)
             print(io, "[$n] ")
             # this is the only change in this function:
+            # show(io, meth)
             my_show_method(io, meth)
             file, line = Base.updated_methodloc(meth)
-            push!(Base.LAST_SHOWN_LINE_INFOS, (string(file), line))
+            if last_shown_line_infos !== nothing
+                push!(last_shown_line_infos, (string(file), line))
+            end
         else
             rest += 1
             last = meth
@@ -92,6 +90,8 @@ function my_show_method_table(io::IO, ms::Base.MethodList, max::Int=-1, header::
         end
     end
 end
+
+
 
 """
     typeinfo(x, st::Bool=false)

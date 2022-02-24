@@ -3,6 +3,8 @@
 exec julia --project=@. --color=yes --startup-file=no "${BASH_SOURCE[0]}" "$@"
 =#
 
+#@linter_refs create_sysimage
+
 docstring = """
 tool to perform usual tasks on a Julia project
 
@@ -42,7 +44,10 @@ using Pkg
 project_dir = dirname(Pkg.project().path)
 project_name = Pkg.project().name
 
+# switch to our own private environment
 Pkg.activate("mk", shared=true)
+
+using PackageCompiler, MethodAnalysis
 
 ################### static params start
 
@@ -53,7 +58,7 @@ development_packages = ["Revise", "Atom", "Juno", "MethodAnalysis", "JuliaInterp
     "StaticLint", "PkgAuthentication", "CodeTools", "Traceur", "BenchmarkTools"]
 
 # automatically add these packages to a new project
-auto_packages = ["Revise", "Atom", "Juno", "JuliaInterpreter", "BenchmarkTools"]
+auto_packages = ["Revise", "JuliaInterpreter", "BenchmarkTools"] #  + "Atom", "Juno" if Atom is used
 
 # do not add these packages to the default using.txt (this does not exclude adding it to the image)
 nousing_packages=["Atom"]
@@ -61,7 +66,8 @@ nousing_packages=["Atom"]
 # never add these packages to the image
 noimage_packages = []
 
-# additional commands to execute before image generation if a package is present
+# additional commands to execute before image generation if a package is present. This can
+# massively speed up first run of JIT-ted commands.
 image_commands = Dict(
     "PlotlyJS" => "display(plot([1],[1]))",
     "JLD2" => "load(\"/home/takbal/workspace/Jtb/data/compressed.jld2\"); "*
@@ -118,8 +124,6 @@ registry_name = "takbal"
 remote_git_server = "10.10.10.3"
 
 ################### static params end
-
-using PackageCompiler, MethodAnalysis
 
 """temporarily switch to this dir; works with the do keyword"""
 function with_working_directory(f::Function, path::AbstractString)

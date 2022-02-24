@@ -1,5 +1,7 @@
 using Logging, LoggingExtras, Dates
 
+#@linter_refs CoreLogging, handle_message, shouldlog, min_enabled_level, catch_exceptions
+
 import Base.CoreLogging:
     AbstractLogger, SimpleLogger,
     handle_message, shouldlog, min_enabled_level, catch_exceptions
@@ -7,7 +9,7 @@ import Base.CoreLogging:
 """
     add_file_logger(filename::String, append::Bool=false)
 
-add a timestamped file logger to the global logger if is a ConsoleLogger, and return the combined logger
+add a timestamped file logger to the global logger if it is a ConsoleLogger, and return the combined logger
 
 you can use it like global_logger( add_file_logger(filename) )
 """
