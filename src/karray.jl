@@ -111,7 +111,7 @@ function AxisKeys.KeyedArray(path::AbstractString; type::DataType=Array{Any,2},
 end
 
 """
-    karray_to_dict(K::KeyedArray)::Dict
+    Base.convert(K::KeyedArray)::Dict
 
 Convert the 1-dimensional KeyedArray to a Dict.
 """
@@ -181,9 +181,9 @@ of the modified KeyedArrays.
 Dimensions do not need to be in the same order, or to be present in all of the arrays, but old
 keys and new keys must be comparable with the == operator for the same dimension.
 
-Keys can be unsorted, but at randomly ordered keys, the remapping may take N^2
-time. If the keys are (or close to being) sorted, the remapping is efficient, but a key in
-the target that does not occur in the source runs at worst-case time (as we have to check all keys
+Keys can be unsorted, but with randomly ordered keys, the remapping may take O(N^2)
+time at worst. If the keys are (or close to being) sorted, the remapping is efficient, but a key in
+the target that does not occur in the source runs at worst-case O(N) time (as we have to check all keys
 that it is indeed missing). For large arrays, it is strongly recommended to sort the arrays
 in the sync dimension beforehand, in order to use a more efficient algorithm.
 
@@ -200,7 +200,7 @@ Parameters:
     fillval       : use this value to fill newly added entries if necessary
 
 Returns:
-    transformed K1, K2, ... KeyedArrays
+    transformed K1, K2, ... KeyedArrays as a tuple, or a single transformed KeyedArray
 
 Example:
 
@@ -267,7 +267,7 @@ function sync_to(dims2keys::AbstractDict, args...; fillval=NaN)
                     if !sorted
 
                         # if we cannot assume that keys in either are unique or sorted, the
-                        # worst case is N^2 when keys are in random order in both. But we
+                        # worst case is O(N^2) when keys are in random order in both. But we
                         # can start the search so that if keys are - or close to - being
                         # sorted the algo becomes efficient. This is sadly still N lookup
                         # to determine if the target key is not present in the source.
