@@ -127,7 +127,11 @@ remote_git_server = "10.10.10.3"
 
 """temporarily switch to this dir; works with the do keyword"""
 function with_working_directory(f::Function, path::AbstractString)
-    prev_wd = pwd()
+	prev_wd = homedir()
+	try
+		prev_wd = pwd()
+    catch
+	end
     try
         cd(path)
         f()
