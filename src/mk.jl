@@ -195,6 +195,10 @@ function generate_new_version(inc_ver_type::AbstractString,
     println("temporarily removing packages needed only for development ...")
     packages_to_readd = []
     for dp in development_packages
+        # special case for Jtb itself: we need JuliaInterpreter as a dependency
+        if dp == "JuliaInterpreter" && project_name == "Jtb"
+            continue
+        end
         if dp in keys(Pkg.project().dependencies)
             println("  removing $dp ...")
             Pkg.rm(dp)
