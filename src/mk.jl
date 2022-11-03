@@ -88,7 +88,11 @@ image_commands = Dict(
                           help = "a positional argument"
                   end
                   parse_args(s)
-                  """
+                  """,
+    "Optim" => """
+               f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2
+               optimize(f, [0. 0.], LBFGS())
+               """
 )
 
 # this points to a Julia environment where the registry is going to be updated from. It must
