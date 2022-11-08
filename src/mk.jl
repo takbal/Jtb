@@ -36,6 +36,9 @@ Where task is one of:
 
     Generating a release will first check if repo is clean, and the tests run without failure.
     Then it is going to create the changelog, and checks it in.
+
+    The tool runs in its own global environment named "mk" that needs to have PackageCompiler and
+    MethodAnalysis installed.
 """
 
 using Pkg
