@@ -107,8 +107,18 @@ function typeinfo(x, st::Bool=false)
 
     println("       type: ", string(x))
 
-    println(" supertypes: ", supertypes(x))
+    println()
 
+    println("   isabstract: ", isabstracttype(x))
+    println("   isconcrete: ", isconcretetype(x))
+    println("     isstruct: ", isstructtype(x))
+    println("    ismutable: ", ismutabletype(x))
+    println("  issingleton: ", Base.issingletontype(x))
+    println("       isbits: ", isbitstype(x))
+
+    println()
+
+    println(" supertypes: ", supertypes(x))
     println("   subtypes: ", subtypes(x))
 
     println("\nconstructors:\n")

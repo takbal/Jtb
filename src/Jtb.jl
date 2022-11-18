@@ -5,6 +5,7 @@ export allslice, anyslice, propfill!
 
 include("karray.jl")
 export convert_eltype, extdim, unwrap, sync, sync_to, alldimsbut, convert_kc
+export transform_keys, replace_keys, shift_keys
 export KeyedVector, KeyedMatrix, Keyed3D
 
 include("logging.jl")

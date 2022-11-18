@@ -1,5 +1,7 @@
 using CSV, AxisKeys, DataStructures, UniqueVectors, NamedDims
 
+# these tools assume that KeyedArrays are created by NamedDimsArray as a parent
+
 const KeyedVector = KeyedArray{Element,1,NamedDimsArray{Names,Element,1,Container},
                 Tuple{UniqueVector{RowType}}} where
                     {Element, Container, Names, RowType}
@@ -181,11 +183,10 @@ of the modified KeyedArrays.
 Dimensions do not need to be in the same order, or to be present in all of the arrays, but old
 keys and new keys must be comparable with the == operator for the same dimension.
 
-Keys can be unsorted, but with randomly ordered keys, the remapping may take O(N^2)
-time at worst. If the keys are (or close to being) sorted, the remapping is efficient, but a key in
-the target that does not occur in the source runs at worst-case O(N) time (as we have to check all keys
-that it is indeed missing). For large arrays, it is strongly recommended to sort the arrays
-in the sync dimension beforehand, in order to use a more efficient algorithm.
+If the keys are, or close to being sorted, the remapping takes only O(N) time. Keys can 
+be randomly ordered, but in this case, the remapping may take O(N^2) time at worst. For large
+arrays, it is recommended to sort the arrays in the sync dimension beforehand, in order
+to use a more efficient algorithm.
 
 If keys are not unique, multiple same-keyed values may get copied in the original order until
 the same non-unique keys are present in the target keys. This works properly
@@ -193,21 +194,22 @@ only if there are no out-of-order keys between the non-unique ones; otherwise, i
 that the same non-unique keyed entry is copied multiple times for each non-unique target key.
 In general, use sortkeys() before applying this function if you have non-unique keys.
 
-Parameters:
+# Parameters:
 
-    dims2keys     : a dimension::Symbol => key dict storing target keys
-    K1, K2, ...   : KeyedArrays to sync (can be single)
-    fillval       : use this value to fill newly added entries if necessary
+- `dims2keys`     : a dimension::Symbol => key dict storing target keys
+- `K1`, `K2`, ...   : KeyedArrays to sync (can be single)
+- `fillval`       : use this value to fill newly added entries if necessary
 
-Returns:
-    transformed K1, K2, ... KeyedArrays as a tuple, or a single transformed KeyedArray
+# Returns:
 
-Example:
+transformed K1, K2, ... KeyedArrays as a tuple, or a single transformed KeyedArray
+
+# Example:
 
     K = sync_to(Dict(:x => ["foo","bar"]), K, fillval = 0)
 
-    # K's :x dimension will have "foo" and "bar" keys. If it had values at them,
-    # they are preserved, others are set to 0.
+K's `:x` dimension will have "foo" and "bar" keys. If it had values at them,
+they are preserved, others are set to 0.
 """
 function sync_to(dims2keys::AbstractDict, args...; fillval=NaN)
 
@@ -357,13 +359,13 @@ The function tries to preserve the key store type of the first input.
 
 Calls sync_to() internally, see some tips there.
 
-Parameters:
+# Parameters:
 
-    K1, K2, ... : KeyedArrays to sync (must be more than one)
-    type        : if :inner, target intersect of keys, if :outer, take union
-    dims        : the dimension(s) to do the syncing in. If nothing, sync all dimensions.
-    fillval     : use this value to fill newly added entries if necessary.
-    keys_only   : if true, do not sync arrays, just return the unified key lists
+- K1, K2, ... : KeyedArrays to sync (must be more than one)
+- type        : if :inner, target intersect of keys, if :outer, take union
+- dims        : the dimension(s) to do the syncing in. If nothing, sync all dimensions.
+- fillval     : use this value to fill newly added entries if necessary.
+- keys_only   : if true, do not sync arrays, just return the unified key lists
 
 Examples:
 
@@ -458,4 +460,71 @@ function Base.diff(K::KeyedArray; dims, removefirst::Bool=true)
 
     return out
 
+end
+
+"""
+    transform_keys(f, K::KeyedArray; dim)
+
+Returns a new KeyedArray with the same content but f applied to all keys in dim.
+The call preserves the container type, but uses an intermediate Array.
+
+# Examples
+
+    transform_keys(d->d+Day(1), K; dim=:dates)
+
+This adds a day to keys, so lags the data *backwards*. Note that this will add
+previously non-existent keys if there are gaps in the dates.
+"""
+function transform_keys(f, K::KeyedArray; dim)
+    old_keys = axiskeys(K, dim)
+    container_type = typeof(old_keys)
+    new_keys = container_type( [ f(x) for x in old_keys ] )
+    return replace_keys(new_keys, K; dim)
+end
+
+"""
+    replace_keys(keys, K::KeyedArray; dim)
+
+Returns a new KeyedArray with the keys in dimension `dim` changed to `keys`.
+"""
+function replace_keys(keys, K::KeyedArray; dim)
+
+    newkeys = Base.setindex( axiskeys(K), keys, NamedDims.dim(K, dim) )
+
+    return wrapdims( unwrap(K); OrderedDict(zip(dimnames(K), newkeys))...  )
+    
+end
+
+"""
+    shift_keys(amount::Int, K::KeyedArray; dim)
+
+Returns a new KeyedArray with the keys in `dim` shifted backward of forward by `amount`.
+The call preserves the container type, but may use an intermediate Array.
+Data that has no key after the shift are dropped.
+
+# Examples
+
+    shift_keys(1, K; dim=:dates)
+
+This moves all dates forward by 1, so lags the data *backwards*. The data for the last
+date are dropped, and the first date is not available anymore.
+"""
+function shift_keys(amount::Int, K::KeyedArray; dim)
+
+    oldk = axiskeys(K, dim)
+    container_type = typeof(oldk)
+    lower_bound = max(1,1+amount)
+    upper_bound = min(length(oldk),length(oldk)+amount)
+    newk = container_type( oldk[lower_bound:upper_bound] )
+
+    newkeys = Base.setindex( axiskeys(K), newk, NamedDims.dim(K, dim) )
+
+    olda = axes(K, dim)
+    lower_bound = max(1,1-amount)
+    upper_bound = min(length(oldk),length(oldk)-amount)
+    newa = olda[lower_bound:upper_bound]
+
+    newaxes = Base.setindex( axes(K), newa, NamedDims.dim(K, dim) )
+
+    return wrapdims(unwrap(K)[newaxes...]; OrderedDict(zip(dimnames(K), newkeys))...)
 end

@@ -1,4 +1,4 @@
-using Test, Jtb, Dates, AxisKeys
+using Test, Jtb, Dates, AxisKeys, Random
 
 Random.seed!(123456)
 
@@ -61,4 +61,11 @@ end
     @test isequal( mat8, KeyedArray( Matrix{Int64}([ 0 1 2 ; 0 3 4 ; 0 5 6 ]), rows=["r1,+", "r2x,+", "r2x,-"], cols=["bar", "col2", "col3"]) )
     @test isequal( mat9, KeyedArray( Matrix{Int64}([ 0 0 0 ; 0 0 2 ]), rows=["foo", "r1,+"], cols=["bar", "col2", "col3"]) )
     @test isequal( diff(mat1; dims=1), KeyedArray( Matrix{Int64}([ 2 2 ; 2 2 ]), rows=["r2x,+", "r2x,-"], cols=["col2", "col3"]) )
+    timedatemat = wrapdims([1 2 3 ; 4 5 6 ;;; 7 8 9 ; 10 11 12], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,1);Date(2022,1,2);Date(2022,1,4)], foobar=["foo";"bar"])
+    timedatemat = transform_keys(d->d+Day(2), timedatemat; dim=:dates )
+    timedatemat = transform_keys(t->t-Hour(1), timedatemat; dim=:times )
+    @test isequal( timedatemat, wrapdims([1 2 3 ; 4 5 6 ;;; 7 8 9 ; 10 11 12], times=[Time(8,00);Time(9,00)], dates=[Date(2022,1,3);Date(2022,1,4);Date(2022,1,6)], foobar=["foo";"bar"]) )
+    timedatemat = wrapdims([1 2 3 ; 4 5 6], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,1);Date(2022,1,2);Date(2022,1,4)])
+    timedatemat = shift_keys(1, timedatemat; dim=:dates)
+    @test isequal( timedatemat, wrapdims([1 2 ; 4 5 ], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,2);Date(2022,1,4)]))
 end
