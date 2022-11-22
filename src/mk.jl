@@ -31,6 +31,7 @@ Where task is one of:
     patch         : generate a patch release
     changelog     : auto-generate changelog (also called by minor/major/patch)
     build         : run the build script (deps/build.jl)
+    app [fltstd]  : create a standalone app (see PackageCompiler). If fltstd is added, set filter_stdlibs=true
 
     The affected environment is the one selected by --project=@.
 
@@ -58,7 +59,7 @@ using PackageCompiler, MethodAnalysis
 # so they are never going to be a dependency. Add packages here that are only needed during
 # development.
 development_packages = ["Revise", "Atom", "Juno", "MethodAnalysis", "JuliaInterpreter",
-    "StaticLint", "PkgAuthentication", "CodeTools", "Traceur", "BenchmarkTools"]
+    "StaticLint", "PkgAuthentication", "CodeTools", "Traceur", "BenchmarkTools", "JET"]
 
 # automatically add these packages to a new project
 auto_packages = ["Revise", "JuliaInterpreter", "BenchmarkTools"] #  + "Atom", "Juno" if Atom is used
@@ -395,10 +396,24 @@ function create_compiled()
     end
 end
 
+function generate_app(pdir, filter_stdlibs)
+    create_app(pdir, joinpath(pdir, "app"); force=true, filter_stdlibs)
+    for f in readdir( joinpath(pdir, "app", "lib"); join = true)
+        if isfile(f)
+            run(`strip $f`)
+        end
+    end
+    for f in readdir( joinpath(pdir, "app", "lib", "julia"); join = true)
+        if isfile(f)
+            run(`strip $f`)
+        end
+    end
+end
+
 #################### script starts here
 
 if length(ARGS) == 0 || !(ARGS[1] in ["new", "build", "major", "minor", "patch", "changelog",
-                 "image", "addev", "env", "using", "compiled"])
+                 "image", "addev", "env", "using", "compiled", "app"])
 
     println("Unknown task specified.")
     println()
@@ -415,9 +430,10 @@ elseif ARGS[1] == "compiled"
     create_compiled()
 else
 
-    Pkg.activate(project_dir)
-
     with_working_directory(project_dir) do
+
+        # this will keep PackageCompiler available from 'mk'
+        Pkg.activate(project_dir)
 
         if ARGS[1] == "image"
             generate_image(project_dir)
@@ -436,6 +452,8 @@ else
                 generate_new_version(ARGS[1], project_name, project_dir)
             elseif ARGS[1] == "changelog"
                 generate_changelog()
+            elseif ARGS[1] == "app"
+                generate_app(project_dir, length(ARGS) > 1 && ARGS[2] == "fltstd")
             else
                 error("you should not get here")
             end

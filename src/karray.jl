@@ -335,22 +335,35 @@ function sync_to(dims2keys::AbstractDict, args...; fillval=NaN)
 end
 
 """
-    function sync_to(K::KeyedArray, K1, K2, ...; fillval=NaN)
+    sync_to(K::KeyedArray, K1, K2, ...; dims=nothing, fillval=NaN)
 
-Sync KeyedArrays simultaneously to the keys of the specified KeyedArray. Returns the tuple
-of the modified KeyedArrays. Uses the sync_to() with AbstractDict internally; see that method
-for detailed usage.
+Sync KeyedArrays simultaneously to the keys of the specified KeyedArray for the specified
+dimensions (`nothing` sync all). Returns the tuple of the modified KeyedArrays. Uses `sync_to` internally;
+see that method for detailed usage.
 """
-sync_to(to_karray::KeyedArray, args...; fillval=NaN) = sync_to(Dict(zip(dimnames(to_karray), axiskeys(to_karray))), args...; fillval)
+function sync_to(to_karray::KeyedArray, args...; fillval=NaN, dims::Union{Symbol,Tuple,AbstractVector{Symbol},Nothing}=nothing)
+    if isnothing(dims)
+        dims = dimnames(to_karray)
+    end
+    if typeof(dims) == Symbol
+        dims = (dims,)
+    end
+    d2k = Dict{Symbol,Any}()        
+    for d in dims
+        d2k[d] = axiskeys(to_karray, d)
+    end
+
+    return sync_to(d2k, args...; fillval)
+end
 
 """
-    sync(K1, K2...; type=:inner, dims::Union{AbstractArray{Symbol,1},Nothing}=nothing,
-         fillval=NaN, keys_only::Bool=false)
+    sync(K1, K2...; type=:inner, dims=nothing, fillval=NaN, keys_only::Bool=false)
 
 Sync KeyedArrays to each other in the specified dimensions. Returns the tuple of the modified KeyedArrays.
 
-Dimensions do not need to be in the same order, or to be present in all of the arrays, but key types
-must match if the dimension matches.
+Dimensions can be constrained to a subset in `dims` or use all available if `nothing` is specified. They do not need
+to be in the same order, or to be present in all of the arrays, but key types must match if the
+dimension matches.
 
 Outgoing keys are going to be sorted. If keys were not unique, only one of them is going to be
 preserved (due to union() and intersect() is dropping multiple copies).
@@ -383,7 +396,7 @@ Examples:
     # the same key type, but it can be at a different index.
 """
 function sync(args...; type=:inner,
-            dims::Union{Symbol,Tuple,AbstractArray{Symbol,1},Nothing}=nothing,
+            dims::Union{Symbol,Tuple,AbstractVector{Symbol},Nothing}=nothing,
             fillval=NaN, keys_only::Bool=false)
 
     @assert length(args) > 1 "you need to specify more then one KeyedArrays"
@@ -395,11 +408,11 @@ function sync(args...; type=:inner,
         dims = union( [dimnames(x) for x in args]... )
     end
 
-    d2k = Dict{Symbol,Any}()
-
     if typeof(dims) == Symbol
         dims = (dims,)
     end
+
+    d2k = Dict{Symbol,Any}()
 
     for d in dims
         origkeys = [ axiskeys(x, d) for x in args if d in dimnames(x) ]
@@ -487,7 +500,7 @@ end
 
 Returns a new KeyedArray with the keys in dimension `dim` changed to `keys`.
 """
-function replace_keys(keys, K::KeyedArray; dim)
+function replace_keys(keys::AbstractVector, K::KeyedArray; dim)
 
     newkeys = Base.setindex( axiskeys(K), keys, NamedDims.dim(K, dim) )
 
