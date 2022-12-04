@@ -59,7 +59,7 @@ using PackageCompiler, MethodAnalysis
 # so they are never going to be a dependency. Add packages here that are only needed during
 # development.
 development_packages = ["Revise", "Atom", "Juno", "MethodAnalysis", "JuliaInterpreter",
-    "StaticLint", "PkgAuthentication", "CodeTools", "Traceur", "BenchmarkTools", "JET"]
+    "StaticLint", "PkgAuthentication", "CodeTools", "Traceur", "BenchmarkTools", "JET", "ProfileView"]
 
 # automatically add these packages to a new project
 auto_packages = ["Revise", "JuliaInterpreter", "BenchmarkTools"] #  + "Atom", "Juno" if Atom is used

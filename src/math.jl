@@ -211,11 +211,11 @@ apply f to groups in X defined by index lists, then concatenate results.
 
 Input:
 
-    f: the function to apply to indexed subsets of X
+- `f`: the function to apply to indexed subsets of X
 
-    X: data
+- `X`: data
 
-    groups: collection of vectors of indices, each defining a group
+- `groups`: collection of vectors of indices, each defining a group
 
 Outputs a length(groups) sized vector.
 """
