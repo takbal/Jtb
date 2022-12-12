@@ -198,7 +198,9 @@ In general, use sortkeys() before applying this function if you have non-unique 
 
 - `dims2keys`     : a dimension::Symbol => key dict storing target keys
 - `K1`, `K2`, ...   : KeyedArrays to sync (can be single)
-- `fillval`       : use this value to fill newly added entries if necessary
+- `fillval`       : use this value to fill newly added entries if necessary. If set to
+                    `nothing`, filling is skipped (this is useful if keys are not extended,
+                    but can be dangerous otherwise).
 
 # Returns:
 
@@ -240,7 +242,9 @@ function sync_to(dims2keys::AbstractDict, args...; fillval=NaN)
         # try to keep the original eltype / container
 
         K_trans_unwrapped = similar( unwrap(K), [length(k) for (d,k) in newkeys]... )
-        fill!(K_trans_unwrapped, convert(eltype(K), fillval) )
+        if !isnothing(fillval)
+            fill!(K_trans_unwrapped, convert(eltype(K), fillval) )
+        end
 
         getindices = []
         setindices = []
@@ -377,7 +381,7 @@ Calls sync_to() internally, see some tips there.
 - K1, K2, ... : KeyedArrays to sync (must be more than one)
 - type        : if :inner, target intersect of keys, if :outer, take union
 - dims        : the dimension(s) to do the syncing in. If nothing, sync all dimensions.
-- fillval     : use this value to fill newly added entries if necessary.
+- fillval     : use this value to fill newly added entries if necessary (ignored for :inner).
 - keys_only   : if true, do not sync arrays, just return the unified key lists
 
 Examples:
@@ -400,6 +404,11 @@ function sync(args...; type=:inner,
             fillval=NaN, keys_only::Bool=false)
 
     @assert length(args) > 1 "you need to specify more then one KeyedArrays"
+
+    # skip filling if keys are constrained
+    if :type == :inner
+        fillval = nothing
+    end
 
     # determine target keys in each dimension
 

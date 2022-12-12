@@ -18,7 +18,7 @@ export nancumsum, nancumsum!, ismissingornan, ismissingornanorzero, nanfunc, nan
        groupfunc, fit_symmetric_parabola
 
 include("datetime.jl")
-export get_interval_indices
+export get_interval_indices, shortstring
 
 include("process.jl")
 export is_pid_alive

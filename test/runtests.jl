@@ -29,6 +29,9 @@ end
     @test isequal(
         get_interval_indices( Array(DateTime(2014,1,29):Hour(1):DateTime(2014,2,3)), Day),
         ([1, 25, 49, 73, 97, 121], [24, 48, 72, 96, 120, 121]))
+    @test isequal(
+        shortstring(canonicalize(Second(123456))),
+        "1d:10h:17m:36s")
 end
 
 @testset "julia" begin
