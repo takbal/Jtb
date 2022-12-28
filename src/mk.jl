@@ -3,7 +3,7 @@
 exec julia --project=@. --color=yes --startup-file=no "${BASH_SOURCE[0]}" "$@"
 =#
 
-#@linter_refs create_sysimage, visit, MethodAnalysis
+#@linter_refs create_sysimage, visit, MethodAnalysis, create_app
 
 docstring = """
 tool to perform usual tasks on a Julia project

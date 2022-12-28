@@ -257,3 +257,28 @@ function fit_symmetric_parabola(X::AbstractArray, Y::AbstractArray)
     return y0, alpha
 
 end
+
+"""
+    equal_partition(n::Int64, parts::Int64)
+
+Splits `n` into `parts` number of pieces that are as close to equally sized as possible.
+Returns `n` parts if `n` < `parts`.
+"""
+function equal_partition(n::Int64, parts::Int64)
+    if n < parts
+        return [ x:x for x in 1:n ]
+    end
+    starts = push!(Int64.(round.(1:n/parts:n)), n+1)
+    return [ starts[i]:starts[i+1]-1 for i in 1:length(starts)-1 ]
+end
+
+"""
+    equal_partition(V::AbstractVector, parts::Int64)
+
+Splits `V` into `parts` number of disjunct views that are as close to equally sized as possible.
+Returns `n` parts if `n` < `parts`.
+    """
+function equal_partition(V::AbstractVector, parts::Int64)
+    ranges = equal_partition(length(V), parts)
+    return [ view(V,range) for range in ranges ]
+end

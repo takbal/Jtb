@@ -1,6 +1,6 @@
 using Logging, LoggingExtras, Dates
 
-#@linter_refs CoreLogging, handle_message, shouldlog, min_enabled_level, catch_exceptions
+#@linter_refs CoreLogging, handle_message, shouldlog, min_enabled_level, catch_exceptions, TeeLogger
 
 import Base.CoreLogging:
     AbstractLogger, SimpleLogger,
