@@ -167,29 +167,36 @@ returns min(x,y), but ignores NaNs unless both x and y are NaN.
 nanmin(x,y) = isnan(x) ? y : ( isnan(y) ? x : min(x,y) )
 
 """
-    map_lastn(f, v::AbstractVector, N::Int; default=NaN)
+    map_lastn(f, v::AbstractVector, N::Int; default=NaN, out_eltype=eltype(v))
 
 For all index i in v, apply f to the vector formed from the previous N not-nan and
 non-missing value of v up to index i-1, and store the result at index i. If there
-are no N values yet collected, use the default value. The resulting vector has
-the same size as v.
+are no N values yet collected, use the default value. If the last N values accessible
+did not change, then recycle the previous value. The output vector has
+the same size as v. You can control the default value and the type of the
+output vector elements.
 """
-function map_lastn(f, v::AbstractVector, N::Int; default=NaN)
+function map_lastn(f, v::AbstractVector, N::Int; default=NaN, out_eltype=eltype(v))
 
-    out = similar(v)
+    out = similar(v, out_eltype)
 
     # a slightly lower allocation, same speed
-    dqueue = Deque{eltype(v)}()
-    # dqueue = Vector{eltype(v)}()
+    # dqueue = Deque{eltype(v)}()
+    dqueue = Vector{eltype(v)}()
 
     filled = false
+    changed = true
 
     for (i,x) in enumerate(v)
         if !filled
             filled = length(dqueue) == N
         end
         if filled
-            out[i] = f(dqueue)
+            if changed
+                out[i] = f(dqueue)
+            else
+                out[i] = out[i-1]
+            end
         else
             out[i] = default
         end
@@ -198,6 +205,9 @@ function map_lastn(f, v::AbstractVector, N::Int; default=NaN)
                 popfirst!(dqueue)
             end
             push!(dqueue, x)
+            changed = true
+        else
+            changed = false
         end
     end
 

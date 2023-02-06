@@ -98,7 +98,7 @@ function imagesc(data::AbstractMatrix, lo::Layout = Layout(); kwargs...)
             convdata = unwrap(data)
         end
             lo, datakeys = _prepare_plotting(lo, data)
-        trace = heatmap(;x = datakeys[1], y = datakeys[2], z = convdata, kwargs...)
+        trace = heatmap(;x = datakeys[1], y = datakeys[2], z = convdata', kwargs...)
     else
         trace = heatmap(;z = data, kwargs...)
     end

@@ -142,7 +142,7 @@ function convert_eltype(eltype::Type, K::KeyedArray; kwargs...)::KeyedArray
 end
 
 """
-    extdim(K::KeyedArray, dimname=:_, label=nothing; atdim=nothing::KeyedArray
+    extdim(K::KeyedArray, dimname=:_, label=nothing; atdim=nothing)::KeyedArray
 
 Extend the passed KeyedArray with an extra dimension. Must supply a dimension name and a label
 array for the existing data in the new dimension, like Kext = extdim(K, :foo, ["bar"]).
