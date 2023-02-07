@@ -229,3 +229,20 @@ function trace_fractile(X, Y, numbins=10; ignorezeros_x=false, ignorezeros_y=fal
     return out
 
 end
+
+"""
+Calls a script that gracefully shuts down all Plotly windows (actually, all windows that are named "Julia").
+
+Needs the `wmctrl` tool installed.
+"""
+function closeall()
+
+    script = "WIN_IDs=\$(wmctrl -l | grep -wE \"Julia\$\" | cut -f1 -d' ')
+    for i in \$WIN_IDs; do
+            wmctrl -ic \"\$i\"
+    done"
+
+    run(`/bin/sh -c $script`)
+
+    nothing
+end
