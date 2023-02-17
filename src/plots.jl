@@ -246,3 +246,13 @@ function closeall()
 
     nothing
 end
+
+"""
+    reset_color_idx()
+
+Resets the color index (so repeated plots from the command line will show the same colors).
+"""
+function reset_color_idx()
+    global clidx
+    clidx = 1
+end

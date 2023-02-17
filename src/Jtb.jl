@@ -24,7 +24,8 @@ include("process.jl")
 export is_pid_alive
 
 include("plots.jl")
-export imagesc, unfocus, add_keypress_handler, maximize, trace_fractile, trace_density, closeall
+export imagesc, unfocus, add_keypress_handler, maximize,
+       trace_fractile, trace_density, closeall, reset_color_idx
 
 include("text.jl")
 export boldify, italicify, printjson
