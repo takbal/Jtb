@@ -337,22 +337,44 @@ function create_new_project()
         run(`ln -s $(compiled_txt) $(project_location)/compiled.txt`)
     end
 
-    println("creating remote ...")
-    run(`ssh git@$remote_git_server "new $project_name.git ; exit"`)
-
     # set the new project's initial version to 0.0.0 rather than to the default 0.1.0
     change_projectfile_version(joinpath(project_location, "Project.toml"), v"0.0.0")
 
     Pkg.activate(project_location)
     add_dev_packages()
 
-    println("adding git repository ...")
+    println("creating git repository ...")
     with_working_directory(project_location) do
         run(`git init`)
         run(`git add .`)
         run(`git commit -m "[AUTO] initial check-in"`)
-        run(`git remote add origin git@$remote_git_server:$project_name.git`)
-        run(`git push --set-upstream origin master`)
+
+        remote_added = false
+
+        print("add a local remote at $remote_git_server? [Y/n] ")
+        if strip(readline()) != "n"
+            run(`ssh git@$remote_git_server "new $project_name.git ; exit"`)
+            run(`git remote add origin git@$remote_git_server:$project_name.git`)
+            run(`git remote set-url --add --push origin git@$remote_git_server:$project_name.git`)
+            remote_added = true
+        end
+
+        print("add a public remote at GitHub (gh and jq must work)? [y/N] ")
+        if strip(readline()) == "y"
+            print("enter your username: ")
+            username = strip(readline())
+            run(`gh auth login`)
+            username = run(`gh api user | jq -r '.login'`)
+            run(`gh repo create $project_name --public`)
+            username = readchomp(pipeline(`gh api user`, `jq -r '.login'`))
+            run(`git remote set-url --add --push origin https://github.com/$username/$project_name.git`)
+            remote_added = true
+        end
+
+        if remote_added
+            run(`git push --set-upstream origin master`)
+        end
+
     end
 
 end
