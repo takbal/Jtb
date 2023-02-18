@@ -361,8 +361,6 @@ function create_new_project()
 
         print("add a public remote at GitHub (gh and jq must work)? [y/N] ")
         if strip(readline()) == "y"
-            print("enter your username: ")
-            username = strip(readline())
             run(`gh auth login`)
             username = run(`gh api user | jq -r '.login'`)
             run(`gh repo create $project_name --public`)
