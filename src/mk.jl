@@ -33,7 +33,7 @@ Where task is one of:
     build         : run the build script (deps/build.jl)
     app [fltstd]  : create a standalone app (see PackageCompiler). If fltstd is added, set filter_stdlibs=true
 
-    The affected environment is the one selected by --project=@.
+    The affected environment is the one selected by 'julia --project=@'.
 
     Generating a release will first check if repo is clean, and the tests run without failure.
     Then it is going to create the changelog, and checks it in.
@@ -362,7 +362,6 @@ function create_new_project()
         print("add a public remote at GitHub (gh and jq must work)? [y/N] ")
         if strip(readline()) == "y"
             run(`gh auth login`)
-            username = run(`gh api user | jq -r '.login'`)
             run(`gh repo create $project_name --public`)
             username = readchomp(pipeline(`gh api user`, `jq -r '.login'`))
             run(`git remote set-url --add --push origin https://github.com/$username/$project_name.git`)
