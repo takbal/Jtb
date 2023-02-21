@@ -55,7 +55,7 @@ using PackageCompiler, MethodAnalysis
 
 my_location = dirname(realpath(Base.source_path()))
 
-testdata_location = joinpath(my_location, "..", "data")
+testdata_location = normpath(my_location, "..", "data")
 
 ################### static params start
 
@@ -125,7 +125,7 @@ image_commands = Dict(
 
 registry_environment = "$(homedir())/.julia/environments/local-packages"
 
-def_project_location = joinpath(my_location, "..", "..")
+def_project_location = normpath(my_location, "..", "..")
 
 compiled_txt = joinpath(def_project_location, "templates", "julia_compiled.txt")
 
