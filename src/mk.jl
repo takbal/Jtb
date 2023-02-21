@@ -53,6 +53,10 @@ Pkg.activate("mk", shared=true)
 
 using PackageCompiler, MethodAnalysis
 
+my_location = Base.source_dir()
+
+testdata_location = joinpath(my_location, "..", "data")
+
 ################### static params start
 
 # these are the packages that, if found, will got temporarily removed for making a release,
@@ -74,8 +78,8 @@ noimage_packages = []
 # massively speed up first run of JIT-ted commands.
 image_commands = Dict(
     "PlotlyJS" => "display(plot([1],[1]))",
-    "JLD2" => "load(\"/home/takbal/workspace/Jtb/data/compressed.jld2\"); "*
-              "load(\"/home/takbal/workspace/Jtb/data/uncompressed.jld2\")",
+    "JLD2" => "load(\"$(testdata_location)/compressed.jld2\"); "*
+              "load(\"$(testdata_location)/uncompressed.jld2\")",
     "ArgParse" => """
                   s = ArgParseSettings()
                   @add_arg_table! s begin
@@ -119,17 +123,17 @@ image_commands = Dict(
 #   println("  removing package from registry environment ...")
 #   Pkg.rm( project_name )
 
-registry_environment = "/home/takbal/.julia/environments/local-packages"
+registry_environment = "$(homedir())/.julia/environments/local-packages"
 
-def_project_location = "/home/takbal/takbal/projects/workspace_box"
+def_project_location = joinpath(my_location, "..", "..")
 
 compiled_txt = joinpath(def_project_location, "templates", "julia_compiled.txt")
 
 # the name of the registry to use. We also determine the local registry checkout location from this
-registry_name = "takbal"
+registry_name = ENV["USER"]
 
 # remote git server name or IP
-remote_git_server = "10.10.10.3"
+remote_git_server = "localhost"
 
 ################### static params end
 
