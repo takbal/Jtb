@@ -53,7 +53,7 @@ Pkg.activate("mk", shared=true)
 
 using PackageCompiler, MethodAnalysis
 
-my_location = Base.source_dir()
+my_location = dirname(realpath(Base.source_path()))
 
 testdata_location = joinpath(my_location, "..", "data")
 
