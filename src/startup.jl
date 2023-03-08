@@ -1,33 +1,54 @@
-# copy this file below ~/.julia/config/startup.jl for mk.jl to work
+# copy this file (or merge with existing) below ~/.julia/config/startup.jl for using / compiled in mkj.jl to work
 
 atreplinit() do repl
 
     # hack to avoid running this twice if PlotlyJS is used
     if repl.options.tabwidth == 8
-        repl.options.tabwidth = 6
+        repl.options.tabwidth = 7
 
         @eval using Pkg
-        # parse using.txt
-        project_dir = dirname(Base.active_project())
-        using_file = joinpath( project_dir, "using.txt")
-        compiled_file = joinpath( project_dir, "compiled.txt")
-        if isfile( using_file )
-            # check if the sysimage loaded matches the current project file
-            try
-                manifest_file = joinpath( project_dir, "Manifest.toml")
-                orig_mf = readlines( manifest_file )
-                img_mf = readlines( manifest_file * ".sysimage" )
-                project_file = Base.active_project()
+
+        project_file = Base.active_project()
+        project_dir = dirname(project_file)
+        manifest_file = joinpath( project_dir, "Manifest.toml")
+
+        # check if the sysimage loaded matches the current project file
+        pf_mismatch = false
+        if isfile(project_file * ".sysimage")
+            img_pf = readlines( project_file * ".sysimage" )
+            if isfile(project_file)
                 orig_pf = readlines( project_file )
-                img_pf = readlines( project_file * ".sysimage" )
-                if orig_mf != img_mf || orig_pf != img_pf
-                    @warn "Project files changed, please re-generate image."
-                end
-            catch
+            else
+                orig_pf == ""
             end
-            open( using_file, "r" ) do file
+            if orig_pf != img_pf
+                pf_mismatch = true
+            end
+        end
+
+        mf_mismatch = false
+        if isfile(manifest_file * ".sysimage")
+            img_mf = readlines( manifest_file * ".sysimage" )
+            if isfile(manifest_file)
+                orig_mf = readlines( manifest_file )
+            else
+                orig_mf == ""
+            end
+            if orig_mf != img_mf
+                mf_mismatch = true
+            end
+        end
+        if pf_mismatch || mf_mismatch
+            @warn "Project or manifest files changed, please re-generate image."
+        end
+
+        if isfile(joinpath(project_dir, "mkj.toml"))
+            
+            config = Pkg.TOML.parsefile(joinpath(project_dir, "mkj.toml"))
+
+            if !isempty(config["using"]["packages"])
                 print("using")
-                for tmp in eachline(file)
+                for tmp in config["using"]["packages"]
                     print(" $(tmp),")
                     if tmp != "Revise" # we do that later
                         eval( Meta.parse( "using $(tmp)" ) )
@@ -35,20 +56,19 @@ atreplinit() do repl
                 end
                 println("\b ")
             end
-        end
-        # set specified modules to compiled for faster debugging
-        if isfile( compiled_file )
-            try
+
+            # set specified modules to compiled for faster debugging
+
+            direct_deps = [ pkg.name for (_,pkg) in Pkg.dependencies() if pkg.is_direct_dep ]
+            if "JuliaInterpreter" in direct_deps
                 @eval using JuliaInterpreter
-                open( compiled_file, "r" ) do file
-                    for item in eachline(file)
-                        push!(JuliaInterpreter.compiled_modules, Module(Symbol(item)))
-                    end
+                for item in config["compiled"]["modules"]
+                    push!(JuliaInterpreter.compiled_modules, Module(Symbol(item)))
                 end
-            catch
             end
         end
-        # run Revise separately
+
+        # run Revise separately as last
         try
             @eval using Revise
         catch
