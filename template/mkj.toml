@@ -1,0 +1,59 @@
+# sample config for the 'mkj' tool
+
+# in the [image_commands] values, [gitlab] and [local_registry] sections:
+#   {user} is replaced by ENV["USER"]
+#   {home} is replaced by ENV["HOME"]
+#   {template_location} is replaced by the location of the template directory
+
+[new]
+# automatically add these packages to a new project:
+# (this section has no relevance for an existing project,
+# and therefore it is deleted after the template is copied)
+packages = ["Revise", "JuliaInterpreter", "BenchmarkTools", "Test"]
+
+[release]
+# packages that, if found, will be temporarily removed before making a release:
+exclude = ["Revise", "Atom", "Juno", "MethodAnalysis", "JuliaInterpreter",
+    "StaticLint", "PkgAuthentication", "CodeTools", "Traceur", "BenchmarkTools", "JET", "ProfileView", "Test"]
+
+[using]
+# automatically use these packages upon start of the REPL (if the startup.jl is installed)
+# this can be auto-generated from the installed packages by 'mkj using', typically run after
+# adding a new package:
+packages = []
+# never add these packages to using packages by 'mkj using':
+exclude = ["Atom", "Test"]
+
+[compiled]
+# modules to add to JuliaInterpreter's compiled modules to speed up debugging (if the startup.jl is installed)
+# this can be auto-generated from Base by 'mkj compiled', typically run at major julia version changes:
+modules = []
+# never add these packages to compiled packages by 'mkj compiled':
+exclude = []
+
+[image]
+# image packages for 'mkj image' are automatically determined from the list of non-developmental packages,
+# therefore they do not have a list here.
+# never add these packages to the list of image packages:
+exclude = []
+
+# additional commands to execute before image generation if the package is present
+# This can massively speed up first execution of key functions in these packages
+[image_commands]
+PlotlyJS = "display(plot([1]))"
+JLD2 = "load(\"{template_location}/../julia_image_data/jld2/compressed.jld2\") ; load(\"{template_location}/../julia_image_data/jld2/uncompressed.jld2\")"
+ArgParse = "s = ArgParseSettings(); add_arg_table!(s,[\"--o1\"],Dict(:help=>\"h\"),\"--o2\",Dict(:arg_type =>Int,:default=>0),\"--flag1\",Dict(:action=>:store_true),\"arg1\"); parse_args(s)"
+Optim = "f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2 ; optimize(f, [0. 0.], LBFGS())"
+
+[gitlab]
+# use this as group tag for new GitLab projects
+group = ""
+
+[local_registry]
+# use the local registry
+use = false
+# the name of the local registry to use
+# the registry git checkout is assumed to be $HOME/.julia/registries/(name) here
+name = "{user}"
+# local remote git server name or IP
+remote_git_server = "localhost"
