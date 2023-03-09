@@ -256,3 +256,60 @@ function reset_color_idx()
     global clidx
     clidx = 1
 end
+
+"""
+    disp(fig; title="figure", show=true, saveto=nothing, xsize=nothing, ysize=nothing, server_dir="/tmp/figures", include_plotlyjs="cdn")
+
+save or diplay a plotly plot through the figure server
+
+Parameters
+----------
+    fig: plotly fig
+        the figure
+    title: str, default = "figure"
+        figure title, included in file name
+    show: bool, def=True
+        if true, show the plot
+    saveto : str, optional
+        if present, directory to save the plot into
+    xsize: int, optional
+        if shown, window x size in pixels, default is max
+    ysize: int, optional
+        if shown, window y size in pixels, default is max
+    dir: str, default = /tmp/figures
+        the directory of the figserv.py)
+    include_plotlyjs: str, optional, def = "cdn"
+        specifies this field for saveto (see plotly)
+"""
+function disp(fig; title="figure", show=true, saveto=nothing, xsize=nothing, ysize=nothing,
+              server_dir="/tmp/figures", include_plotlyjs="cdn")
+
+    if show
+
+        if isnothing(xsize)
+            xsize = "max"
+        else
+            xsize = string(xsize)
+        end
+
+        if isnothing(ysize)
+            ysize = "max"
+        else
+            ysize = string(ysize)
+        end
+
+        fname = randstring(8) * "!" * xsize * "!" * ysize * "!" * title * ".html"
+        mkpath(server_dir)
+        open(joinpath(server_dir, fname), "w") do file
+            PlotlyBase.to_html(file, fig; autoplay=false, include_plotlyjs = "directory")
+        end
+
+    end
+
+    if !isnothing(saveto)
+        mkpath(saveto)
+        open(joinpath(saveto, title * ".html"), "w") do file
+            PlotlyBase.to_html(file, fig; autoplay=false, include_plotlyjs = include_plotlyjs)
+        end
+    end
+end
