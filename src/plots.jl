@@ -301,7 +301,7 @@ function disp(fig; title="figure", show=true, saveto=nothing, xsize=nothing, ysi
         fname = randstring(8) * "!" * xsize * "!" * ysize * "!" * title * ".html"
         mkpath(server_dir)
         open(joinpath(server_dir, fname), "w") do file
-            PlotlyBase.to_html(file, fig; autoplay=false, include_plotlyjs = "directory")
+            PlotlyBase.to_html(file, fig.plot; autoplay=false, include_plotlyjs = "directory")
         end
 
     end
@@ -309,7 +309,7 @@ function disp(fig; title="figure", show=true, saveto=nothing, xsize=nothing, ysi
     if !isnothing(saveto)
         mkpath(saveto)
         open(joinpath(saveto, title * ".html"), "w") do file
-            PlotlyBase.to_html(file, fig; autoplay=false, include_plotlyjs = include_plotlyjs)
+            PlotlyBase.to_html(file, fig.plot; autoplay=false, include_plotlyjs = include_plotlyjs)
         end
     end
 end
