@@ -417,9 +417,9 @@ function create_new_project()
                     run(`glab auth login`)
                     run(`glab repo create $project_name --group $gitlab_group`)
                     if !(remote_added)
-                        run(`git remote add origin git@$remote_git_server:$project_name.git`)
+                        run(`git remote add origin https://gitlab.com/$gitlab_group/$project_name.git`)
                     end
-                    run(`git remote set-url --add --push origin git@$remote_git_server:$project_name.git`)
+                    run(`git remote set-url --add --push origin https://gitlab.com/$gitlab_group/$project_name.git`)
                     remote_added = true
                 end
 
