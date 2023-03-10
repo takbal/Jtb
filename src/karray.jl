@@ -1,4 +1,4 @@
-using CSV, AxisKeys, DataStructures, UniqueVectors, NamedDims
+using CSV, AxisKeys, DataStructures, UniqueVectors, NamedDims, AcceleratedArrays
 
 # these tools assume that KeyedArrays are created by NamedDimsArray as a parent
 
@@ -455,11 +455,21 @@ end
 """
     convert_kc(K::KeyedArray, container_type::Type=UniqueVector)::KeyedArray
 
-Returns a modified KeyedArray where key containers are replaced by the specified type.
+Returns a modified KeyedArray where key containers are converted to the specified type.
 Using a type like UniqueVector can improve lookup speed of indexing.
+
+For AcceleratedArrays, specify the index type, like one of HashIndex,
+UniqueHashIndex, SortIndex or UniqueSortIndex.
 """
-convert_kc(K::KeyedArray, container_type::Type=UniqueVector)::KeyedArray =
-    KeyedArray( NamedDimsArray( unwrap(K), dimnames(K)), tuple( [ container_type(x) for x in axiskeys(K) ]...) )
+function convert_kc(K::KeyedArray, container_type::Type=UniqueVector)::KeyedArray
+
+    if container_type in [HashIndex, UniqueHashIndex, SortIndex, UniqueSortIndex]
+        return KeyedArray( NamedDimsArray( unwrap(K), dimnames(K)), tuple( [ if isa(x, AcceleratedArray) x else accelerate(x, container_type) end for x in axiskeys(K) ]...) )
+    else
+        return KeyedArray( NamedDimsArray( unwrap(K), dimnames(K)), tuple( [ if isa(x, container_type) x else container_type(x) end for x in axiskeys(K) ]...) )
+    end
+
+end
 
 """
     alldimsbut(K::KeyedArray, querydim)
