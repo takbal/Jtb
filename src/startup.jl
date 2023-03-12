@@ -1,11 +1,18 @@
 # copy this file (or merge with existing) below ~/.julia/config/startup.jl for using / compiled in mkj.jl to work
 
+try
+    using Revise
+catch
+end
+
+ENV["JULIA_EDITOR"] = "code"
+
 atreplinit() do repl
 
     # hack to avoid running this twice if PlotlyJS is used
     if repl.options.tabwidth == 8
         repl.options.tabwidth = 7
-
+                
         @eval using Pkg
 
         project_file = Base.active_project()
@@ -50,7 +57,7 @@ atreplinit() do repl
                 print("using")
                 for tmp in config["using"]["packages"]
                     print(" $(tmp),")
-                    if tmp != "Revise" # we do that later
+                    if tmp != "Revise" # we have done that
                         eval( Meta.parse( "using $(tmp)" ) )
                     end
                 end
@@ -67,19 +74,6 @@ atreplinit() do repl
                 end
             end
         end
-
-        # run Revise separately as last
-        try
-            @eval using Revise
-        catch
-        end
-        # vscode's recommendation
-        # @async try
-        #     sleep(0.1)
-        #     @eval using Revise
-        #     @async Revise.wait_steal_repl_backend()
-        # catch
-        # end
     end
 end
-ENV["JULIA_EDITOR"] = "code"
+
