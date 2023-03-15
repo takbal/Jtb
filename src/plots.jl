@@ -17,14 +17,34 @@ const colorway = [
 # where are we in the colorway
 clidx = 1
 
+"""
+    next_color_idx()
+
+Advances the color index
+"""
 function next_color_idx()
     global clidx
     clidx < length(colorway) ? clidx += 1 : clidx = 1
 end
 
+"""
+    get_color()
+
+Return the actual color
+"""
 function get_color()
     global clidx, colorway
     return colorway[clidx]
+end
+
+"""
+    reset_color_idx()
+
+Resets the color index (so repeated plots from the command line will show the same colors).
+"""
+function reset_color_idx()
+    global clidx
+    clidx = 1
 end
 
 function _prepare_plotting(lo::Layout, K::KeyedArray)
@@ -245,16 +265,6 @@ function closeall()
     run(`/bin/sh -c $script`)
 
     nothing
-end
-
-"""
-    reset_color_idx()
-
-Resets the color index (so repeated plots from the command line will show the same colors).
-"""
-function reset_color_idx()
-    global clidx
-    clidx = 1
 end
 
 """
