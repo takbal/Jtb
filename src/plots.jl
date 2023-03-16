@@ -28,13 +28,17 @@ function next_color_idx()
 end
 
 """
-    get_color()
+    get_color(step)
 
-Return the actual color
+Return the actual color. If step is true, go to the next one.
 """
-function get_color()
+function get_color(step = false)
     global clidx, colorway
-    return colorway[clidx]
+    act_cw = colorway[clidx]
+    if step
+        next_color_idx()
+    end
+    return act_cw
 end
 
 """
