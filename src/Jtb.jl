@@ -37,4 +37,7 @@ export typeinfo, compilemode, meth
 include("stats.jl")
 export fractiles
 
+include("files.jl")
+export getdir
+
 end # module
