@@ -55,7 +55,7 @@ function AxisKeys.KeyedArray(path::AbstractString; type::DataType=Array{Any,2},
     extension = splitext(path)[2]
 
     # CSV
-    if extension in [".csv", ".txt", ".tsv"]
+    if extension in [".csv", ".txt", ".tsv", ".gz"]
 
         data = CSV.File(path; kwargs...)
         numrows = length(data)
