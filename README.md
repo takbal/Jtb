@@ -2,10 +2,12 @@ A collection of tools.
 
 # INSTALL
 
-'mkj' assumes that your projects are located in the following directory format:
+The 'mkj' tool is a command line utility to help with creating new projects, images, releases, and more.
+
+It assumes the following directory layout for your projects:
 
 ```
-workspace/             # name is not important
+workspace/             # name is not important (if different, update ju.sh)
     Jtb/               # repo of this project
     Project1/          # your projects come here
     Project2/
@@ -32,7 +34,9 @@ Add git-shell-commands, chsh git-shell. ssh -l git@localhost should work.
 
 Login and add
 
+```
 new julia-registry.git
+```
 
 Then from a julia client, do
 
