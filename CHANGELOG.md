@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.1 (2023-04-07)
+
+#### New Features
+
+* support for csv.gz
+* added getdir() to list directories
+* auto-stepping in get_color
+* opened up colorway functions
+* moved Revise first in startup
+* added AcceleratedArrays support for convert_kc
+* added disp() for plotly figs over net
+#### Fixes
+
+* plotting export
+* gitlab repo
+
+Full set of changes: [`0.3.0...0.3.1`](git@10.10.10.3:Jtb.git/compare/0.3.0...0.3.1)
+
 ## 0.3.0 (2023-03-09)
 
 #### New Features
