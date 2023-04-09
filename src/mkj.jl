@@ -33,6 +33,7 @@ Where task is one of:
     build         : run the build script (deps/build.jl)
     app [fltstd]  : create a standalone app (see PackageCompiler). If fltstd is added, set filter_stdlibs=true
     changelog     : auto-generate changelog (also called by minor/major/patch)
+    register reg  : register the package at 'reg'
 
     Configuration is stored in the mkj.toml file.
 
@@ -189,62 +190,7 @@ function generate_new_version(inc_ver_type::AbstractString)
     run(`git push origin $new_version`)
 
     if get_config("local_registry", "use")
-
-        # create temporary environment
-
-        Pkg.activate("_local_registry", shared=true, io=devnull)
-
-        if isfile(Pkg.project().path)
-            @error "cannot register package in local registry: the temporary shared environment " *
-                   "'_local_registry' already exists. Please delete it at {dirname(Pkg.project().path)}."
-        else
-            Pkg.add("LocalRegistry")
-
-            @assert isfile(Pkg.project().path) "temporary environment was not created correctly, aborting"
-
-            registry_name = translate_string( get_config("local_registry", "name") )
-            registry_environment = dirname(Pkg.project().path)
-
-            open(joinpath(registry_environment, "register_package.jl"), "w") do file
-                print(file,
-                    """
-                    using LocalRegistry
-                    using Pkg
-
-                    project_dir = ARGS[1]
-                    project_name = ARGS[2]
-                    registry_name = ARGS[3]
-
-                    println("  temporarily adding package to registry environment in dev mode ...")
-                    Pkg.develop( path = project_dir )
-
-                    println("  registering new version from registry environment...")
-                    register(project_name; registry = registry_name)
-
-                    println("  removing package from registry environment ...")
-                    Pkg.rm( project_name )
-                    """             
-                )
-            end
-
-            println("registering new version ...")
-            with_working_directory(registry_environment) do
-                run(`julia --project=$registry_environment register_package.jl $project_dir $project_name $registry_name`)
-            end
-
-            println("pushing registry to remote server ...")
-            with_working_directory( normpath(ENV["HOME"], ".julia", "registries", registry_name) ) do
-                run(`git push`)
-            end
-
-            # remove the temporary project
-
-            rm(dirname(Pkg.project().path), recursive=true)
-
-        end
-
-        Pkg.activate(project_dir, io=devnull)        
-
+        register_package()
     end
 
     println("adding back removed development packages ...")
@@ -259,6 +205,62 @@ function generate_new_version(inc_ver_type::AbstractString)
     println("pushing ...")
     run(`git push`)
 
+end
+
+function register_package(registry_name = translate_string( get_config("local_registry", "name") ))
+
+    # create temporary environment
+    Pkg.activate("_local_registry", shared=true, io=devnull)
+
+    if isfile(Pkg.project().path)
+        @error "cannot register package in local registry: the temporary shared environment " *
+                "'_local_registry' already exists. Please delete it at {dirname(Pkg.project().path)}."
+    else
+        Pkg.add("LocalRegistry")
+
+        @assert isfile(Pkg.project().path) "temporary environment was not created correctly, aborting"
+
+        registry_environment = dirname(Pkg.project().path)
+
+        open(joinpath(registry_environment, "register_package.jl"), "w") do file
+            print(file,
+                """
+                using LocalRegistry
+                using Pkg
+
+                project_dir = ARGS[1]
+                project_name = ARGS[2]
+                registry_name = ARGS[3]
+
+                println("  temporarily adding package to registry environment in dev mode ...")
+                Pkg.develop( path = project_dir )
+
+                println("  registering new version from registry environment...")
+                register(project_name; registry = registry_name)
+
+                println("  removing package from registry environment ...")
+                Pkg.rm( project_name )
+                """             
+            )
+        end
+
+        println("registering new version ...")
+        with_working_directory(registry_environment) do
+            run(`julia --project=$registry_environment register_package.jl $project_dir $project_name $registry_name`)
+        end
+
+        println("pushing registry to remote server ...")
+        with_working_directory( normpath(ENV["HOME"], ".julia", "registries", registry_name) ) do
+            run(`git push`)
+        end
+
+        # remove the temporary project
+
+        rm(dirname(Pkg.project().path), recursive=true)
+
+    end
+
+    Pkg.activate(project_dir, io=devnull)        
 end
 
 function change_projectfile_version(path::AbstractString, v::VersionNumber)
@@ -398,7 +400,7 @@ function create_new_project()
 
                 remote_git_server = translate_string(mkj_config["local_registry"]["remote_git_server"])
 
-                print("set up package a local remote at $remote_git_server? [Y/n] ")
+                print("set up a local remote at $remote_git_server? [Y/n] ")
                 if strip(readline()) != "n"
                     mkj_config["local_registry"]["use"] = true
                     open("mkj.toml", "w") do io
@@ -500,7 +502,7 @@ end
 #################### script starts here
 
 if length(ARGS) == 0 || !(ARGS[1] in ["new", "update", "major", "minor", "patch",
-                 "image", "using", "compiled", "build", "app", "changelog"])
+                 "image", "using", "compiled", "build", "app", "changelog", "register"])
 
     println("Unknown task specified.")
     println()
@@ -540,6 +542,9 @@ else
             generate_app(length(ARGS) > 1 && ARGS[2] == "fltstd")
         elseif ARGS[1] == "changelog"
             generate_changelog()
+        elseif ARGS[1] == "register"
+            @assert length(ARGS) >= 2 "you need to specify the registry name (the first string from ]registry status)"
+            register_package(ARGS[2])
         else
             error("you should not get here")
         end
