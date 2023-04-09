@@ -65,11 +65,11 @@ Login and add
 new julia-registry.git
 ```
 
-This creates the repo for the registry. Then from a julia client, add the registry as usual for `LocalRegistry`
+This creates the repo for the registry. Then from a julia client, add the registry as usual for `LocalRegistry`:
 
 ```
 using LocalRegistry # add if missing, you can remove later
-create_registry("{registry_name}", "git@{server}:julia-registry.git", description="my private github!")
+create_registry("{registry_name}", "git@{server}:julia-registry.git"; description="my private github!")
 ```
 
 where {registry_name} is the name for the new registry, and {server} is the IP. 'localhost' may work.
