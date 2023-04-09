@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2 (2023-04-09)
+
+#### New Features
+
+* register command: allow registering at any registry
+
+Full set of changes: [`0.3.1...0.3.2`](git@10.10.10.3:Jtb.git/compare/0.3.1...0.3.2)
+
 ## 0.3.1 (2023-04-07)
 
 #### New Features
