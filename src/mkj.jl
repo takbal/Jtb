@@ -170,30 +170,36 @@ function generate_new_version(inc_ver_type::AbstractString)
         end
     end
 
-    # auto-changelog needs the new release tag first to generate an entry for it
+    try
 
-    println("tagging release for auto-changelog ...")
-    run(`git tag -a $new_version -m "RELEASE $new_version"`)
+        # auto-changelog needs the new release tag first to generate an entry for it
 
-    println("creating changelog ...")
-    generate_changelog()
+        println("tagging release for auto-changelog ...")
+        run(`git tag -a $new_version -m "RELEASE $new_version"`)
 
-    println("committing pre-release changes ...")
-    # this will not appear in changelog
-    run(`git commit -a -m "[AUTO] pre-release $new_version"`)
+        println("creating changelog ...")
+        generate_changelog()
 
-    println("pushing ...")
-    run(`git tag -f -a $new_version -m "RELEASE $new_version"`)
-    run(`git push`)
-    run(`git push origin $new_version`)
+        println("committing pre-release changes ...")
+        # this will not appear in changelog
+        run(`git commit -a -m "[AUTO] pre-release $new_version"`)
 
-    if !isempty(get_config("local_registry", "name"))
-        register_package()
-    end
+        println("pushing ...")
+        run(`git tag -f -a $new_version -m "RELEASE $new_version"`)
+        run(`git push`)
+        run(`git push origin $new_version`)
 
-    println("adding back removed development packages ...")
-    for dp in packages_to_readd
-        Pkg.add(dp)
+        if !isempty(get_config("local_registry", "name"))
+            register_package()
+        end
+
+    finally
+        
+        println("adding back removed development packages ...")
+        for dp in packages_to_readd
+            Pkg.add(dp)
+        end
+
     end
 
     println("committing post-release changes ...")
