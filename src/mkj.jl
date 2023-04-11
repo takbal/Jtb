@@ -33,7 +33,7 @@ Where task is one of:
     build         : run the build script (deps/build.jl)
     app [fltstd]  : create a standalone app (see PackageCompiler). If fltstd is added, set filter_stdlibs=true
     changelog     : auto-generate changelog (also called by minor/major/patch)
-    register reg  : register the package at 'reg'
+    register reg  : register the package at registry 'reg'
 
     Configuration is stored in the mkj.toml file.
 
@@ -42,7 +42,7 @@ Where task is one of:
 
     See README on how to create local registries.
 
-    The tool runs in its own global environment named "mk" that is created automatically. Run 'mkj upgrade'
+    The tool runs in its own global environment named "mkj" that is created automatically. Run 'mkj upgrade'
     to upgrade the packages used there.
 """
 
@@ -50,27 +50,16 @@ using Pkg
 
 ### globals
 
-# store the project what --project==@. found
+# store the project what --project=@. found
 project_dir = dirname(Pkg.project().path)
 project_name = Pkg.project().name
 my_location = dirname(realpath(Base.source_path()))
-def_project_location = normpath(my_location, "..", "..")
-template_location = normpath(my_location, "..", "..", "templates", "julia")
+def_project_location = ENV["JU_WORKSPACE"]
+template_location = normpath(my_location, "template")
 
 ### switch to our own private environment
 
-Pkg.activate("mk", shared=true, io=devnull)
-
-# if this is the first time, setup the environment with the required libraries
-
-deps = [ x.second.name for x in Pkg.dependencies() if x.second.is_direct_dep ]
-
-if !("MethodAnalysis" in deps)
-    Pkg.add("MethodAnalysis")
-end
-if !("PackageCompiler" in deps)
-    Pkg.add("PackageCompiler")
-end
+Pkg.activate("mkj", shared=true, io=devnull)
 
 using PackageCompiler, MethodAnalysis
 
@@ -210,7 +199,7 @@ end
 function register_package(registry_name = translate_string( get_config("local_registry", "name") ))
 
     # create temporary environment
-    Pkg.activate("_local_registry", shared=true, io=devnull)
+    Pkg.activate(;temp=true, io=devnull)
 
     if isfile(Pkg.project().path)
         @error "cannot register package in local registry: the temporary shared environment " *
@@ -253,10 +242,6 @@ function register_package(registry_name = translate_string( get_config("local_re
         with_working_directory( normpath(ENV["HOME"], ".julia", "registries", registry_name) ) do
             run(`git push`)
         end
-
-        # remove the temporary project
-
-        rm(dirname(Pkg.project().path), recursive=true)
 
     end
 
@@ -465,6 +450,14 @@ function update_using()
 
     to_using = [ pkg.name for (_,pkg) in Pkg.dependencies() if pkg.is_direct_dep &&
                 !(pkg.name in nousing_packages) && !pkg.is_tracking_path ]
+
+    # always put Revise first
+    revise_idx = findfirst(to_using .== "Revise")
+    if !isnothing(revise_idx)
+        to_using[revise_idx] = to_using[1]
+        to_using[1] = "Revise"
+    end
+
     # put tracked packages last (these will not get compiled into the image)
     append!(to_using, [ pkg.name for (key,pkg) in Pkg.dependencies() if pkg.is_direct_dep &&
                 !(pkg.name in nousing_packages) && pkg.is_tracking_path ])
@@ -495,7 +488,7 @@ function generate_app(filter_stdlibs)
 end
 
 function update_mk()
-    Pkg.activate("mk", shared=true, io=devnull)
+    Pkg.activate("mkj", shared=true, io=devnull)
     Pkg.update()
 end
 

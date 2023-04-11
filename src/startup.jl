@@ -1,9 +1,4 @@
-# copy this file (or merge with existing) below ~/.julia/config/startup.jl for using / compiled in mkj.jl to work
-
-try
-    using Revise
-catch
-end
+# include or copy this file (or merge with existing) below ~/.julia/config/startup.jl for using / compiled in mkj.jl to work
 
 ENV["JULIA_EDITOR"] = "code"
 
@@ -57,9 +52,7 @@ atreplinit() do repl
                 print("using")
                 for tmp in config["using"]["packages"]
                     print(" $(tmp),")
-                    if tmp != "Revise" # we have done that
-                        eval( Meta.parse( "using $(tmp)" ) )
-                    end
+                    eval( Meta.parse( "using $(tmp)" ) )
                 end
                 println("\b ")
             end

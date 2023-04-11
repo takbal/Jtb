@@ -1,25 +1,10 @@
 A collection of useful functions.
 
-# mkj
-
-The `mkj` tool is a command line utility to help with creating new projects, images, releases, and more.
-
-It runs stand-alone, without installing the package itself anywhere.
-
-It assumes the following directory layout for your projects:
-
-```
-workspace/             # name is not important (if different, update ju.sh)
-    Jtb/               # repo of this project
-    Project1/          # your projects come here
-    Project2/
-    ...
-    templates/
-        julia/              # template for new projects
-        julia_image_data/   # (optional) additional data for image creation
-```
-
 # installing `mkj`
+
+The `mkj` tool is a stand-alone command line utility to help with creating new projects, images, releases, and more.
+
+It installs its stuff in a private environment below `$HOME/.julia/environments/mkj`.
 
 1. You will need the following executables to be present on your system:
 
@@ -27,19 +12,40 @@ workspace/             # name is not important (if different, update ju.sh)
 - `auto-changelog` Python package (`pip install auto-changelog`)
 - `glab` if you want to automatically create GitLab repos for new projects (https://gitlab.com/gitlab-org/cli/-/releases)
 - `gh` and `jq` if you want to automatically create github repos for new projects (https://cli.github.com/, `sudo apt-get install jq`)
-- `ssh` if you need a local registry (see below how to set up one)
+- `ssh` if you need a local git package server (see below how to set up one)
 
-2. Copy the `Jtb/template` folder to the location at `templates/julia/` above, and edit it there to your liking.
+2. Temporarily install `Jtb`, then run `Jtb.install_mkj()`:
 
-3. To run some of the default image creation helpers, also copy `Jtb/julia_image_data` to
-   `templates/julia_image_data/` as shown above.
+```
+$ julia
+julia> using Pkg
+julia> Pkg.activate(;tmp=true)
+julia> Pkg.add("Jtb")
+julia> using Jtb
+julia> Jtb.install_mkj()
+julia> exit()
+```
 
-4. For automatically using packages and enhance debugging speed, copy or merge `Jtb/src/startup.jl` with yours at `~/.julia/config/startup.jl`.
+3. For automatically using packages and enhance debugging speed, you will need to extend
+your $HOME/.julia/config/startup.jl with the following:
 
-5. add the contents of `ju.sh` to your .bashrc or .zshrc (the latter with completion support). Edit the functions
-if your workspace directory is different.
+```
+include( joinpath(ENV["HOME"], ".julia", "environments", "mkj", "startup.jl" ) )
+```
 
-6. create a link on your $PATH by `ln -s {Jtb_checkout_dir}/src/mkj.jl mkj`.
+A startup file with this content is created automatically if it does not exists.
+
+4. You will need to extend your .bashrc or .zshrc (the latter works with completion support) with the following:
+
+```
+WORKSPACES=(workspace_dir1 workspace_dir2 ...)
+source $HOME/.julia/environments/mkj/ju.sh
+```
+
+Here specify the list of directories like $HOME/workspace where Julia projects will be located. `mkj` will suggest the
+first of these as location when creating a new project.
+
+5. Edit the project template below `$HOME/.julia/environments/mkj/template` to your liking.
 
 # Local registries
 
@@ -53,7 +59,7 @@ with `mkj register {registry_name}`.
 
 Think it like your private github or gitlab - if you use those, you probably do not need this. 
 
-# Howto set up a local git server
+# How to set up a local git server
 
 Read https://www.vogella.com/tutorials/GitHosting/article.html on how to create a local git user.
 

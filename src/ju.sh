@@ -1,3 +1,8 @@
+alias mkj="$HOME/.julia/environments/mkj/mkj.jl"
+
+# copy the first workspace for mkj
+export JU_WORKSPACE=${WORKSPACES[@]:0:1}
+
 # automatically select and run julia in an environment, like "ju envname [params]"
 
 ju()
@@ -11,13 +16,22 @@ ju()
 
   if [[ "$#" == "0" ||  $1 == "." ]]; then
           projectdir=`julia --startup-file=no --project=@. -e "println(dirname(Base.active_project()))"`
-  elif [ -d $HOME/.julia/environments/$1 ]; then
-    projectdir=$HOME/.julia/environments/$1
-  elif [ -d $HOME/workspace/$1 ]; then
-    projectdir=$HOME/workspace/$1
   else
-    echo "cannot find specified environment"
-    return 1
+    if [ -d $HOME/.julia/environments/$1 ]; then
+      projectdir=$HOME/.julia/environments/$1
+    else
+      projectdir=""
+      for act_dir in ${WORKSPACES[@]}; do
+        if [ -d $act_dir/$1 ]; then
+          projectdir=$act_dir/$1
+          break
+        fi
+      done
+      if [[ -z "${projectdir}" ]]; then
+        echo "cannot find specified environment"
+        return 1
+      fi
+    fi
   fi
 
   if [ $# != "0" ]; then
@@ -31,26 +45,32 @@ ju()
         fi
 }
 
-# automatic env completion for the ju() call in zsh (cut this below for bash)
+ju_shell=`ps -p $$ -o comm=`
 
-_ju() {
-  local state
+# automatic env completion for the ju() call in zsh
 
-  _arguments \
-    '1: :->julia_environment'\
-    '*: :->other'
+if [[ $ju_shell == "zsh" ]]; then
 
-  # add more directories here if you need:
-  envs_ls=`ls -1d $HOME/workspace/*/ $HOME/.julia/environments/*/`
-  envs_array=("${(f)envs_ls}")
-  envs=()
-  for i in $envs_array; do envs+=`basename $i`; done
+  _ju() {
+    local state
 
-  case $state in
-    (julia_environment) _arguments '1:environment:($envs)' ;;
-    (other) _gnu_generic ;;
-  esac
-}
+    _arguments \
+      '1: :->julia_environment'\
+      '*: :->other'
 
-compdef _ju ju
-compdef _gnu_generic julia
+    # add more directories here if you need:
+    envs_ls=`ls -1d $HOME/workspace/*/ $HOME/.julia/environments/*/`
+    envs_array=("${(f)envs_ls}")
+    envs=()
+    for i in $envs_array; do envs+=`basename $i`; done
+
+    case $state in
+      (julia_environment) _arguments '1:environment:($envs)' ;;
+      (other) _gnu_generic ;;
+    esac
+  }
+
+  compdef _ju ju
+  compdef _gnu_generic julia
+
+fi
