@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.3 (2023-04-11)
+
+#### New Features
+
+* added the ability to add repos after creation
+* moved files into mkj project; installation script
+
+Full set of changes: [`0.3.2...0.3.3`](git@10.10.10.3:Jtb.git/compare/0.3.2...0.3.3)
+
 ## 0.3.2 (2023-04-09)
 
 #### New Features
