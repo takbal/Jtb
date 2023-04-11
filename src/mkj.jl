@@ -33,7 +33,10 @@ Where task is one of:
     build         : run the build script (deps/build.jl)
     app [fltstd]  : create a standalone app (see PackageCompiler). If fltstd is added, set filter_stdlibs=true
     changelog     : auto-generate changelog (also called by minor/major/patch)
-    register reg  : register the package at registry 'reg'
+    register reg  : register the package at registry named 'reg'
+    add_gitlab    : add a repo on gitlab for the group [gitlab]/group/project
+    add_github    : add a public repo on github as {username}/project
+    add_gitserver : add a repo at a git server on [git_server]/host
 
     Configuration is stored in the mkj.toml file.
 
@@ -113,6 +116,12 @@ function is_repo_clean()
     return length(output) == 0
 end
 
+"""returns if the current directory's git has a remote"""
+function is_remote_added()
+    output = strip(read(`git remote -v`, String))
+    return length(output) != 0
+end
+
 """generates changelog with auto-changelog"""
 function generate_changelog()
     # switchting to Python version, must use
@@ -178,7 +187,7 @@ function generate_new_version(inc_ver_type::AbstractString)
     run(`git push`)
     run(`git push origin $new_version`)
 
-    if get_config("local_registry", "use")
+    if !isempty(get_config("local_registry", "name"))
         register_package()
     end
 
@@ -198,12 +207,14 @@ end
 
 function register_package(registry_name = translate_string( get_config("local_registry", "name") ))
 
+    @assert !isempty(registry_name) "registry name must be provided at either mkj.toml, or as mkj register name"
+
     # create temporary environment
     Pkg.activate(;temp=true, io=devnull)
 
     if isfile(Pkg.project().path)
         @error "cannot register package in local registry: the temporary shared environment " *
-                "'_local_registry' already exists. Please delete it at {dirname(Pkg.project().path)}."
+                "already exists. Please delete it at {dirname(Pkg.project().path)}."
     else
         Pkg.add("LocalRegistry")
 
@@ -365,8 +376,6 @@ function create_new_project()
 
         end
 
-        remote_added = false
-
         print("do you need git (must have for all remote setup)? [Y/n] ")
         if strip(readline()) != "n"    
             println("creating git repository ...")
@@ -377,68 +386,115 @@ function create_new_project()
             git_added = false
         end
     
-        if isfile("mkj.toml")
+        if git_added
 
-            if git_added
+            if isfile("mkj.toml")
 
                 mkj_config = Pkg.TOML.parsefile("mkj.toml")
 
-                remote_git_server = translate_string(mkj_config["local_registry"]["remote_git_server"])
+                remote_git_server = translate_string(mkj_config["git_server"]["host"])
 
-                print("set up a local remote at $remote_git_server? [Y/n] ")
-                if strip(readline()) != "n"
-                    mkj_config["local_registry"]["use"] = true
-                    open("mkj.toml", "w") do io
-                        Pkg.TOML.print(io, mkj_config)
+                if !isempty(remote_git_server)
+                    print("set up a local remote at $remote_git_server? [y/N] ")
+                    if strip(readline()) == "y"
+                        add_gitserver()
                     end
-
-                    run(`ssh git@$remote_git_server "new $project_name.git ; exit"`)
-                    run(`git remote add origin git@$remote_git_server:$project_name.git`)
-                    run(`git remote set-url --add --push origin git@$remote_git_server:$project_name.git`)
-                    remote_added = true
                 end
 
-                print("add a remote at GitLab? [y/N] ")
-                if strip(readline()) == "y"
-                    gitlab_group = mkj_config["gitlab"]["group"]
-                    run(`glab auth login`)
-                    run(`glab repo create $project_name --group $gitlab_group`)
-                    if !(remote_added)
-                        run(`git remote add origin https://gitlab.com/$gitlab_group/$project_name.git`)
+                gitlab_group = mkj_config["gitlab"]["group"]
+
+                if !isempty(gitlab_group)
+                    print("add a remote at GitLab group $gitlab_group? [y/N] ")
+                    if strip(readline()) == "y"
+                        add_gitlab()
                     end
-                    run(`git remote set-url --add --push origin https://gitlab.com/$gitlab_group/$project_name.git`)
-                    remote_added = true
                 end
 
             end
 
-        end
-
-        if git_added
             print("add a public remote at GitHub (gh and jq must work)? [y/N] ")
-            if strip(readline()) == "y"
-                run(`gh auth login`)
-                run(`gh repo create $project_name --public`)
-                username = readchomp(pipeline(`gh api user`, `jq -r '.login'`))
-                if !(remote_added)
-                    run(`git remote add origin https://github.com/$username/$project_name.git`)
-                end 
-                run(`git remote set-url --add --push origin https://github.com/$username/$project_name.git`)
-                remote_added = true
-            end
-        end
 
-        if git_added
+            if strip(readline()) == "y"
+                add_github()
+            end
+
             # this will not appear in changelog
             run(`git commit -a -m "[AUTO] initial check-in"`)
-        end
 
-        if remote_added
-            run(`git push --set-upstream origin master`)
-            run(`git push`)
+            if is_remote_added()
+                run(`git push`)
+            end
+    
         end
 
     end
+
+end
+
+function add_gitserver()
+
+    global project_name
+    
+    mkj_config = Pkg.TOML.parsefile("mkj.toml")
+    remote_git_server = translate_string(mkj_config["git_server"]["host"])
+
+    @assert !isempty(remote_git_server) "you need to populate [git_server]/host in mkj.toml"
+        
+    run(`ssh git@$remote_git_server "new $project_name.git ; exit"`)
+    has_remote = is_remote_added()
+    if !has_remote
+        run(`git remote add origin git@$remote_git_server:$project_name.git`)
+    end
+    run(`git remote set-url --add --push origin git@$remote_git_server:$project_name.git`)
+    if !has_remote
+        run(`git push -u origin HEAD`)
+    end
+
+    println("set up a repo at $remote_git_server")
+
+end
+
+function add_gitlab()
+
+    global project_name
+
+    mkj_config = Pkg.TOML.parsefile("mkj.toml")
+    gitlab_group = mkj_config["gitlab"]["group"]
+
+    @assert !isempty(gitlab_group) "you need to populate [gitlab]/group in mkj.toml"
+
+    run(`glab auth login`)
+    run(`glab repo create $project_name --group $gitlab_group`)
+    has_remote = is_remote_added()
+    if !has_remote
+        run(`git remote add origin https://gitlab.com/$gitlab_group/$project_name.git`)
+    end
+    run(`git remote set-url --add --push origin https://gitlab.com/$gitlab_group/$project_name.git`)
+    if !has_remote
+        run(`git push -u origin HEAD`)
+    end
+
+    println("set up a repo at https://gitlab.com/$gitlab_group/$project_name.git")
+
+end
+
+function add_github()
+
+    global project_name
+
+    run(`gh auth login`)
+    run(`gh repo create $project_name --public`)
+    username = readchomp(pipeline(`gh api user`, `jq -r '.login'`))
+    has_remote = is_remote_added()
+    if !has_remote
+        run(`git remote add origin https://github.com/$username/$project_name.git`)
+    end
+    run(`git remote set-url --add --push origin https://github.com/$username/$project_name.git`)
+    if !has_remote
+        run(`git push -u origin HEAD`)
+    end 
+
+    println("set up a repo at https://github.com/$username/$project_name.git")
 
 end
 
@@ -495,7 +551,8 @@ end
 #################### script starts here
 
 if length(ARGS) == 0 || !(ARGS[1] in ["new", "update", "major", "minor", "patch",
-                 "image", "using", "compiled", "build", "app", "changelog", "register"])
+                 "image", "using", "compiled", "build", "app", "changelog",
+                 "register", "add_gitlab", "add_github", "add_gitserver"])
 
     println("Unknown task specified.")
     println()
@@ -538,6 +595,12 @@ else
         elseif ARGS[1] == "register"
             @assert length(ARGS) >= 2 "you need to specify the registry name (the first string from ]registry status)"
             register_package(ARGS[2])
+        elseif ARGS[1] == "add_gitlab"
+            add_gitlab()
+        elseif ARGS[1] == "add_github"
+            add_github()
+        elseif ARGS[1] == "add_gitserver"
+            add_gitserver()
         else
             error("you should not get here")
         end

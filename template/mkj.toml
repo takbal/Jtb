@@ -1,6 +1,6 @@
 # sample config for the 'mkj' tool
 
-# in the [image_commands] values, [gitlab] and [local_registry] sections:
+# in the [image_commands] values, [gitlab] and [local_registry], [git_server] sections:
 #   {user} is replaced by ENV["USER"]
 #   {home} is replaced by ENV["HOME"]
 #   {template_location} is replaced by the location of the template directory
@@ -50,10 +50,12 @@ Optim = "f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2 ; optimize(f, [0. 0.]
 group = ""
 
 [local_registry]
-# use the local registry
-use = false
 # the name of the local registry to use
+# set it to empty to skip using it
 # the registry git checkout is assumed to be $HOME/.julia/registries/(name) here
-name = "{user}"
+name = ""
+
+[git_server]
 # local remote git server name or IP
-remote_git_server = "localhost"
+# set it to empty to skip using it
+host = ""
