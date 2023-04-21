@@ -85,12 +85,20 @@ end
 
 function get_config(group, field = nothing)
     global project_dir
-    config = Pkg.TOML.parsefile(joinpath(project_dir, "mkj.toml"))
-    if isnothing(field)
-        return config[group]
-    else
-        return config[group][field]
+    mkj_file = joinpath(project_dir, "mkj.toml")
+    if isfile(mkj_file)
+        config = Pkg.TOML.parsefile(mkj_file)
+        if group in keys(config)
+            if isnothing(field)
+                return config[group]
+            else
+                if field in keys(config[group])
+                    return config[group][field]
+                end
+            end
+        end
     end
+    return nothing
 end
 
 function set_config(group, field, value)
@@ -279,11 +287,16 @@ function generate_image()
 
     noimage_packages = get_config("image", "exclude")
     image_commands = get_config("image_commands")
+    include_packages = get_config("image", "include")
 
     # this determines which packages to put into the image - not the same as for 'using'
     # as tracked packages are excluded
     to_sysimage = [ pkg.name for (_,pkg) in Pkg.dependencies() if pkg.is_direct_dep &&
                     !(pkg.name in noimage_packages) && !pkg.is_tracking_path ]
+
+    if !isnothing(include_packages)
+        append!(to_sysimage, include_packages)
+    end
 
     # create temporary execution file
     pef_fname = joinpath( project_dir, "tmp_pef.jl")

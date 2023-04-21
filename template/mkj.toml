@@ -33,7 +33,8 @@ exclude = []
 
 [image]
 # image packages for 'mkj image' are automatically determined from the list of non-developmental packages,
-# therefore they do not have a list here.
+# but you can force adding development packages here:
+include = []
 # never add these packages to the list of image packages:
 exclude = []
 
