@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.4 (2023-04-21)
+
+#### New Features
+
+* ensure readd dev packages
+
+Full set of changes: [`0.3.3...0.3.4`](git@10.10.10.3:Jtb.git/compare/0.3.3...0.3.4)
+
 ## 0.3.3 (2023-04-11)
 
 #### New Features
