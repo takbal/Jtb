@@ -64,7 +64,10 @@ function install_mkj(; force=false)
     if !("PackageCompiler" in deps)
         Pkg.add("PackageCompiler")
     end
-    
+    if !("SymbolServer" in deps)
+        Pkg.add("SymbolServer")
+    end
+
     # do first what is surely ours
     cp(joinpath(my_location, "mkj.jl"), joinpath(mkj_dir, "mkj.jl"), force = true)
     cp(joinpath(my_location, "startup.jl"), joinpath(mkj_dir, "startup.jl"), force = true)

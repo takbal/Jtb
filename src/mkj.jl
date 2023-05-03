@@ -3,7 +3,7 @@
 exec julia --project=@. --color=yes --startup-file=no "${BASH_SOURCE[0]}" "$@"
 =#
 
-#@linter_refs create_sysimage, visit, MethodAnalysis, create_app
+#@linter_refs create_sysimage, visit, MethodAnalysis, create_app, SymbolServer, SymbolServerInstance, getstore
 
 # TODO: remove JuliaInterpreter from [release]/exclude for Jtb in mkj.toml
 
@@ -37,6 +37,7 @@ Where task is one of:
     add_gitlab    : add a repo on gitlab for the group [gitlab]/group/project
     add_github    : add a public repo on github as {username}/project
     add_gitserver : add a repo at a git server on [git_server]/host
+    symbols       : reparse symbols in dependencies (may help if vscode shows missing refs)
 
     Configuration is stored in the mkj.toml file.
 
@@ -64,7 +65,7 @@ template_location = normpath(my_location, "template")
 
 Pkg.activate("mkj", shared=true, io=devnull)
 
-using PackageCompiler, MethodAnalysis
+using PackageCompiler, MethodAnalysis, SymbolServer
 
 #################################################
 
@@ -567,11 +568,23 @@ function update_mk()
     Pkg.update()
 end
 
+function parse_symbols()
+    
+    global project_dir
+
+    store = joinpath(ENV["HOME"], ".config/Code/User/globalStorage/julialang.language-julia/symbolstorev5/")
+
+    println("adding symbols to store at $store")
+
+    ssi = SymbolServerInstance("", store)
+    getstore(ssi, project_dir)
+end
+
 #################### script starts here
 
 if length(ARGS) == 0 || !(ARGS[1] in ["new", "update", "major", "minor", "patch",
                  "image", "using", "compiled", "build", "app", "changelog",
-                 "register", "add_gitlab", "add_github", "add_gitserver"])
+                 "register", "add_gitlab", "add_github", "add_gitserver", "symbols"])
 
     println("Unknown task specified.")
     println()
@@ -620,6 +633,8 @@ else
             add_github()
         elseif ARGS[1] == "add_gitserver"
             add_gitserver()
+        elseif ARGS[1] == "symbols"
+            parse_symbols()
         else
             error("you should not get here")
         end
