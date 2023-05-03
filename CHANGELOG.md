@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.5 (2023-05-03)
+
+#### New Features
+
+* trace_fractile: added log for Y stds
+* added forced symbol parsing
+
+Full set of changes: [`0.3.4...0.3.5`](git@10.10.10.3:Jtb.git/compare/0.3.4...0.3.5)
+
 ## 0.3.4 (2023-04-21)
 
 #### New Features
