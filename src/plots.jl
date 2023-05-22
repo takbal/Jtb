@@ -211,9 +211,10 @@ in the fractile. Y width of crosses mark the std of the Y data in X's fractiles.
 If 'ignorezeros_x/y' is true, ignore zero values in that input. Missing or nan values
 are always ignored.
 
-If `log_std_y` is true, plot the log of the Y stds.
+If `normalise_std_y` is true, the maximal Y std is scaled to the span of the Y means
+(so the Y size of the crosses is comparable to the means depicted).
 """
-function trace_fractile(X, Y, numbins=10; ignorezeros_x=false, ignorezeros_y=false, log_std_y=false)
+function trace_fractile(X, Y, numbins=10; ignorezeros_x=false, ignorezeros_y=false, normalise_std_y=false)
 
     ignore = ismissingornan.(X) .| ismissingornan.(Y)
     if ignorezeros_x
@@ -231,8 +232,12 @@ function trace_fractile(X, Y, numbins=10; ignorezeros_x=false, ignorezeros_y=fal
     stds_x_ends = groupfunc(StatsBase.std, X, [ groups[1], groups[end] ])
     stds_y = groupfunc(StatsBase.std, Y, groups)
 
-    if log_std_y
-        stds_y = log.(stds_y)
+    if normalise_std_y
+        means_y_span = maximum(means_y) - minimum(means_y)
+        if means_y_span == 0
+            means_y_span = 1
+        end
+        stds_y = stds_y .* means_y_span ./ maximum(stds_y)
     end
 
     high_x = ubounds .- means_x
