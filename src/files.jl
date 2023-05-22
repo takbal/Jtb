@@ -82,10 +82,11 @@ function getdir(path::AbstractString, pattern::Regex = r"";
         end
     else
         for f in readdir(path; join, sort)
-            if dirs && isdir(f)
+            truepath = join ? f : joinpath(path, f)
+            if dirs && isdir(truepath)
                 push!(out, f)
             end
-            if files && isfile(f)
+            if files && isfile(truepath)
                 push!(out, f)
             end
         end
