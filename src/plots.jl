@@ -302,7 +302,7 @@ Parameters
     dir: str, default = /tmp/figures
         the directory of the figserv.py)
     include_plotlyjs: str, optional, def = "cdn"
-        specifies this field for saveto (see plotly)
+        specifies this field for saving (see plotly doc)
 """
 function disp(fig; title="figure", show=true, saveto=nothing, xsize=nothing, ysize=nothing,
               server_dir="/tmp/figures", include_plotlyjs="cdn")
@@ -324,7 +324,7 @@ function disp(fig; title="figure", show=true, saveto=nothing, xsize=nothing, ysi
         fname = randstring(8) * "!" * xsize * "!" * ysize * "!" * title * ".html"
         mkpath(server_dir)
         open(joinpath(server_dir, fname), "w") do file
-            PlotlyBase.to_html(file, fig.plot; autoplay=false, include_plotlyjs = "directory")
+            PlotlyBase.to_html(file, fig.plot; autoplay=false, include_plotlyjs = include_plotlyjs)
         end
 
     end
