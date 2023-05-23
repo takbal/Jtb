@@ -15,7 +15,7 @@ include("math.jl")
 export nancumsum, nancumsum!, ismissingornan, ismissingornanorzero, nanfunc, nanmean, nanstd,
        nanvar, nanminimum, nanmaximum, nanmin, nanmax, nancumprod, nancumprod!, nansum, nanprod,
        cumsum_ignorenans, cumsum_ignorenans!, cumprod_ignorenans, cumprod_ignorenans!, map_lastn,
-       groupfunc, fit_symmetric_parabola
+       groupfunc, fit_symmetric_parabola, equal_partition
 
 include("datetime.jl")
 export get_interval_indices, shortstring
