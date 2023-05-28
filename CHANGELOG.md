@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.6 (2023-05-28)
+
+#### New Features
+
+* use include_plotlyjs for disp'ed plots
+* added equal_partition to exported
+* trace_fractile: Y STDs are now scaled to mean rather log
+#### Fixes
+
+* non-recursive without join
+
+Full set of changes: [`0.3.5...0.3.6`](git@10.10.10.3:Jtb.git/compare/0.3.5...0.3.6)
+
 ## 0.3.5 (2023-05-03)
 
 #### New Features
