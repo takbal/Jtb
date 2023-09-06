@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.7 (2023-09-06)
+
+#### New Features
+
+* added unit test, return values for parexec
+* new threaded parallel sweeper over keyword params
+* added adaptive fractiler
+* added get_field_sizes()
+#### Fixes
+
+* initial check-in for new projects
+
+Full set of changes: [`0.3.6...0.3.7`](git@10.10.10.3:Jtb.git/compare/0.3.6...0.3.7)
+
 ## 0.3.6 (2023-05-28)
 
 #### New Features
