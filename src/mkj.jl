@@ -46,8 +46,8 @@ Where task is one of:
 
     See README on how to create local registries.
 
-    The tool runs in its own global environment named "mkj" that is created automatically. Run 'mkj upgrade'
-    to upgrade the packages used there.
+    The tool runs in its own global environment named "mkj" that is created automatically. Run 'mkj update'
+    to update the packages used there.
 """
 
 using Pkg
@@ -400,8 +400,10 @@ function create_new_project()
         if strip(readline()) != "n"    
             println("creating git repository ...")
             run(`git init`)
-            run(`git add .`)    
-            git_added = true    
+            run(`git add .`)
+            # this will not appear in changelog
+            run(`git commit -a -m "[AUTO] initial check-in"`)
+            git_added = true
         else
             git_added = false
         end
@@ -437,9 +439,6 @@ function create_new_project()
             if strip(readline()) == "y"
                 add_github()
             end
-
-            # this will not appear in changelog
-            run(`git commit -a -m "[AUTO] initial check-in"`)
 
             if is_remote_added()
                 run(`git push`)
