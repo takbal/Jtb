@@ -17,6 +17,8 @@ export nancumsum, nancumsum!, ismissingornan, ismissingornanorzero, nanfunc, nan
        cumsum_ignorenans, cumsum_ignorenans!, cumprod_ignorenans, cumprod_ignorenans!, map_lastn,
        groupfunc, fit_symmetric_parabola, equal_partition
 
+export AdaptiveFractiles, observe!
+
 include("datetime.jl")
 export get_interval_indices, shortstring
 
@@ -32,13 +34,17 @@ include("text.jl")
 export boldify, italicify, printjson
 
 include("julia.jl")
-export typeinfo, compilemode, meth
+export typeinfo, compilemode, meth, get_field_sizes
 
 include("stats.jl")
 export fractiles
 
 include("files.jl")
 export getdir
+
+include("parexec.jl")
+export parexec
+
 
 using Pkg
 

@@ -1,15 +1,15 @@
 """
-function getdir(path::AbstractString, pattern::Regex = r"";
-    dirs::Bool = true,
-    files::Bool = true,
-    recursive::Bool = false,
-    join::Bool = true,
-    normalize::Bool = true,
-    absolute::Bool = false,
-    sort::Bool = true,
-    topdown::Bool = true,
-    hidden::Bool = false,
-    follow_symlinks::Bool = false)::String[]
+    getdir(path::AbstractString, pattern::Regex = r"";
+        dirs::Bool = true,
+        files::Bool = true,
+        recursive::Bool = false,
+        join::Bool = true,
+        normalize::Bool = true,
+        absolute::Bool = false,
+        sort::Bool = true,
+        topdown::Bool = true,
+        hidden::Bool = false,
+        follow_symlinks::Bool = false)::String[]
 
 Returns a list of files or dirs found below a path that match the regexp pattern.
 
