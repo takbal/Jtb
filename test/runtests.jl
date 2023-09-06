@@ -72,3 +72,12 @@ end
     timedatemat = shift_keys(1, timedatemat; dim=:dates)
     @test isequal( timedatemat, wrapdims([1 2 ; 4 5 ], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,2);Date(2022,1,4)]))
 end
+
+@testset "parexec" begin    
+    function foo(; bar, foobar)
+        return bar, foobar
+    end
+    outputs, params = parexec(foo; bar=[1,2], foobar=[true, false])
+    @test isequal( outputs, Any[(1, true), (2, true), (1, false), (2, false)] )
+    @test isequal( params, Dict{Symbol, Integer}[Dict(:foobar => true, :bar => 1), Dict(:foobar => true, :bar => 2), Dict(:foobar => false, :bar => 1), Dict(:foobar => false, :bar => 2)] )
+end
