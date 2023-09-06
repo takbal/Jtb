@@ -292,3 +292,86 @@ function equal_partition(V::AbstractVector, parts::Int64)
     ranges = equal_partition(length(V), parts)
     return [ view(V,range) for range in ranges ]
 end
+
+
+mutable struct AdaptiveFractiles
+    # center of each fractile
+    centers::Vector{Float64}
+    # how much to move towards the middle value on each update
+    decay_rate::Float64
+    # how much to move the matching centroid
+    update_rate::Float64
+end
+
+
+"""
+    AdaptiveFractiles(;
+        num_bins::Int64,
+        decay_rate::Float64,
+        update_rate::Float64,
+        initial_range_center::Float64 = 0.,
+        initial_range::Float64 = 2.)
+
+Create an AdaptiveFractiles struct, that maintains a crude and fast on-line estimation
+of fractile bins of the univariate data observed so far.
+
+Inputs:
+
+    num_bins:
+The number of fractiles to estimate
+
+    decay_rate:
+The rate to move the centers towards the middle of center span on each update. Should 
+be smaller than update_rate.
+
+    update_rate:
+The rate to move the center towards the observation on each update. Should be larger
+than update_rate.
+
+    initial_range_center:
+The mean of the initial range.
+
+    initial_range:
+The width of the initial range.
+"""
+function AdaptiveFractiles(;
+    num_bins::Int64,
+    decay_rate::Float64,
+    update_rate::Float64,
+    initial_range_center::Float64 = 0.,
+    initial_range::Float64 = 2.)
+
+    initial_centers = initial_range .* ( 0:(num_bins-1) ) ./ (num_bins-1)
+    initial_centers = initial_centers .- nanmean(initial_centers)
+    initial_centers = initial_centers .+ initial_range_center
+
+    return AdaptiveFractiles(initial_centers, decay_rate, update_rate)
+
+end
+
+
+"""
+    observe!(af::AdaptiveFractiles, obs::Float64)
+
+Update AdaptiveFractiles with an observation.
+Returns the bin the observation was classified into.
+"""
+function observe!(af::AdaptiveFractiles, obs::Float64)
+
+    # shrink centers towards middle
+    middle = (af.centers[end] + af.centers[1]) / 2
+    for i in axes(af.centers,1)
+        af.centers[i] *= 1-af.decay_rate
+        af.centers[i] += af.decay_rate * middle
+    end
+
+    # determine closest center
+    closest = argmin(abs.(af.centers .- obs))
+
+    # update closest center
+    af.centers[closest] *= 1-af.update_rate
+    af.centers[closest] += af.update_rate * obs
+
+    return closest
+
+end
