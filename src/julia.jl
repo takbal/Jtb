@@ -160,3 +160,26 @@ end
 alternative to methods(x) that always show the file location
 """
 meth(x) = my_show_method_table(stdout, methods(x))
+
+
+"""
+    get_field_sizes(x)
+
+recursively print field sizes in kbytes of struct types
+"""
+function get_field_sizes(v; tabsize = 0)
+
+    if isstructtype(typeof(v))
+        fns = fieldnames(typeof(v))
+        for x in fns
+            actv = getfield(v, x)
+            println(repeat(" ", tabsize) * "$(string(x)) : $(Base.summarysize(actv)/1e3)k")
+            if isstructtype(typeof(actv))
+                get_field_sizes(actv; tabsize = tabsize + 4)
+            end
+        end
+    else
+        println("variable is not a struct type")
+    end
+
+end
