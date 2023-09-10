@@ -18,6 +18,12 @@ end
         propfill!( isnan, [ NaN NaN ; 1 2 ; NaN NaN ; 3 4 ]; dim=1 ),
         [ NaN NaN ; 1 2 ; 1 2 ; 3 4] )
     @test isequal(
+        propfill!( isnan, [ NaN, 1, 2, NaN, 5, NaN ] ),
+        [ NaN, 1, 2, 2, 5, 5] )
+    @test isequal(
+        propfill!( isnan, [ NaN, 1, 2, NaN, 5, NaN ]; backwards = true),
+        [ 1, 1, 2, 5, 5, NaN] )
+        @test isequal(
         anyslice(isnan, cat([NaN 1; NaN NaN], [ NaN 1 ; NaN NaN ], dims=3); dim=1),
         BitVector([1, 1]) )
     @test isequal(
