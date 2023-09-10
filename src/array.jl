@@ -33,21 +33,43 @@ propfill!( isnan, [ NaN NaN ; 1 2 ; NaN NaN ; 3 4 ]; dim=1 )
    3.0    4.0
 
 """
-function propfill!(p, A::AbstractArray; dim, backwards::Bool=false, defvalue=NaN)
+function propfill!(p, A::AbstractArray; dim=1, backwards::Bool=false, defvalue=NaN)
 
     # we cannot use eachslice() due to backwards
 
-    range = backwards ? (size(A, dim):-1:1) : (1:size(A, dim))
+    range = backwards ? reverse(axes(A,dim)) : axes(A,dim)
 
-    buffer = copy(selectdim(A, dim, range[1]))
-    buffer[p.(buffer)] .= defvalue
+    if length(range) > 0
 
-    for i in range
-        v = selectdim(A, dim, i)
-        locs = p.(v)
-        nolocs = (!).(locs)
-        buffer[nolocs] = v[nolocs]
-        v[locs] = buffer[locs]
+        if ndims(A) > 1
+
+            buffer = copy(selectdim(A, dim, range[1]))
+            buffer[p.(buffer)] .= defvalue
+
+            for i in range
+                v = selectdim(A, dim, i)
+                locs = p.(v)
+                nolocs = (!).(locs)
+                buffer[nolocs] = v[nolocs]
+                v[locs] = buffer[locs]
+            end
+
+        else
+
+            # selectdim returns some crazy 0-dim value for 1-dim arrays
+
+            buffer = p( getindex(A, range[1]) ) ? defvalue : getindex(A, range[1])
+
+            for i in range
+                if p(A[i])
+                    A[i] = buffer
+                else
+                    buffer = A[i]
+                end
+            end
+
+        end
+
     end
 
     return A
