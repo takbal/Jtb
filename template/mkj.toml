@@ -45,6 +45,7 @@ PlotlyJS = "display(plot([1]))"
 JLD2 = "load(\"{template_location}/../image_data/jld2/compressed.jld2\") ; load(\"{template_location}/../image_data/jld2/uncompressed.jld2\")"
 ArgParse = "s = ArgParseSettings(); add_arg_table!(s,[\"--o1\"],Dict(:help=>\"h\"),\"--o2\",Dict(:arg_type =>Int,:default=>0),\"--flag1\",Dict(:action=>:store_true),\"arg1\"); parse_args(s)"
 Optim = "f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2 ; optimize(f, [0. 0.], LBFGS())"
+Parquet = "pf = read_parquet(\"{template_location}/../image_data/parquet/sample.parquet\") ; foo = copy(pf.foo) ; bar = copy(pf.bar)"
 
 [gitlab]
 # use this as group tag for new GitLab projects
