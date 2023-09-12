@@ -426,7 +426,7 @@ function create_new_project()
                 gitlab_group = mkj_config["gitlab"]["group"]
 
                 if !isempty(gitlab_group)
-                    print("add a remote at GitLab group $gitlab_group? [y/N] ")
+                    print("add a remote at GitLab group $gitlab_group? (if you choose yes, say 'n' to 'create a local directory' in the following prompts) [y/N] ")
                     if strip(readline()) == "y"
                         add_gitlab()
                     end
