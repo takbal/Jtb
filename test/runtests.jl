@@ -49,31 +49,40 @@ end
 end
 
 @testset "karray" begin
+
     mat1 = KeyedArray("example_matrix.csv", type=Array{Int, 2}, dimnames=["rows", "cols"], keycols=[1,4])
     mat2 = KeyedArray( [ 1 2 ; 3 4 ; 5 6 ], rows=["r1,+", "r2x,+", "r2x,-"], cols = ["col2", "col3"])
     @test isequal( mat1, mat2 )
+
     mat3 = KeyedArray([ 2 ; 1 ; 3 ], keys=[5 ; 4 ; 6])
     d1 = Dict(4=>1, 5=>2, 6=>3)
     @test isequal( convert(Dict, mat3), d1)
     @test isequal( KeyedArray(d1), mat3 )
+
     mat3f = KeyedArray([ 2.0 ; 1.0 ; 3.0 ], keys=[5 ; 4 ; 6])
     @test isequal( convert_eltype(Float64, mat3), mat3f )
+
     mat4 = KeyedArray(Matrix{Int64}([ 2 1 3 ])', keys=[5 ; 4 ; 6], foo=["bar"])
     @test isequal( extdim(mat3, :foo, ["bar"]), mat4 )
+
     mat5 = KeyedArray( [ 0 0 ; 2 0 ], rows=["foo", "r1,+"], cols = ["col3", "bar"])
     @test isequal( sync_to(Dict(:rows => ["foo","r1,+"], :cols => ["col3", "bar"]), mat1, fillval = 0), mat5 )
     @test isequal( sync_to(mat5, mat1, fillval = 0), mat5 )
+
     mat6, mat7 = sync(mat1, mat5, fillval=0, type=:inner, dims=:cols)
     @test isequal( mat6, KeyedArray( Matrix{Int64}([2  4  6])', rows=["r1,+", "r2x,+", "r2x,-"], cols=["col3"]) )
     @test isequal( mat7, KeyedArray( Matrix{Int64}([0  2])', rows=["foo", "r1,+"], cols=["col3"]) )
+
     mat8, mat9 = sync(mat1, mat5, fillval=0, type=:outer, dims=:cols)
     @test isequal( mat8, KeyedArray( Matrix{Int64}([ 0 1 2 ; 0 3 4 ; 0 5 6 ]), rows=["r1,+", "r2x,+", "r2x,-"], cols=["bar", "col2", "col3"]) )
     @test isequal( mat9, KeyedArray( Matrix{Int64}([ 0 0 0 ; 0 0 2 ]), rows=["foo", "r1,+"], cols=["bar", "col2", "col3"]) )
     @test isequal( diff(mat1; dims=1), KeyedArray( Matrix{Int64}([ 2 2 ; 2 2 ]), rows=["r2x,+", "r2x,-"], cols=["col2", "col3"]) )
+
     timedatemat = wrapdims([1 2 3 ; 4 5 6 ;;; 7 8 9 ; 10 11 12], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,1);Date(2022,1,2);Date(2022,1,4)], foobar=["foo";"bar"])
     timedatemat = transform_keys(d->d+Day(2), timedatemat; dim=:dates )
     timedatemat = transform_keys(t->t-Hour(1), timedatemat; dim=:times )
     @test isequal( timedatemat, wrapdims([1 2 3 ; 4 5 6 ;;; 7 8 9 ; 10 11 12], times=[Time(8,00);Time(9,00)], dates=[Date(2022,1,3);Date(2022,1,4);Date(2022,1,6)], foobar=["foo";"bar"]) )
+    
     timedatemat = wrapdims([1 2 3 ; 4 5 6], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,1);Date(2022,1,2);Date(2022,1,4)])
     timedatemat = shift_keys(1, timedatemat; dim=:dates)
     @test isequal( timedatemat, wrapdims([1 2 ; 4 5 ], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,2);Date(2022,1,4)]))
@@ -86,4 +95,18 @@ end
     outputs, params = parexec(foo; bar=[1,2], foobar=[true, false])
     @test isequal( outputs, Any[(1, true), (2, true), (1, false), (2, false)] )
     @test isequal( params, Dict{Symbol, Integer}[Dict(:foobar => true, :bar => 1), Dict(:foobar => true, :bar => 2), Dict(:foobar => false, :bar => 1), Dict(:foobar => false, :bar => 2)] )
+end
+
+@testset "files" begin
+
+    td = mktempdir()
+    run(`touch $td/foo.txt`)
+    run(`touch $td/bar.foo`)
+    mkpath( joinpath( td, "bar") )
+    @test isequal( getdir(td; files = false), [ joinpath(td, "bar") ] )
+    @test isequal( getdir(td; dirs = false, join = false), [ "bar.foo", "foo.txt" ] )
+
+    @test isequal( get_common_path_prefix(["/foo/bar/foobar/", "/foo/bar/whatever", "/foo/bar/foo/bar"]), "/foo/bar" )
+    @test isnothing( get_common_path_prefix(["/foo/bar/foobar/", "/foo/bar/whatever", "foo/bar/foo/bar"]) )
+
 end
