@@ -116,3 +116,44 @@ function getdir(path::AbstractString, pattern::Regex = r"";
     return out
 
 end
+
+
+"""
+get_common_path_prefix(paths::AbstractVector{T}) where T <:AbstractString
+
+Returns the common prefix (the path to the deepest common directory) of the paths given.
+Returns nothing if no such thing was found.
+"""
+function get_common_path_prefix(paths::AbstractVector{T})::Union{String,Nothing} where T <:AbstractString
+
+    # cache splitted versions
+    splitted = Vector{Vector{String}}()
+    for f in paths
+        push!(splitted, splitpath(f))
+    end
+
+    first_different_dir_idx = 0
+    while true
+        first_different_dir_idx += 1
+        if length(splitted[1]) < first_different_dir_idx
+            break
+        end
+        found_different = false
+        for idx in 2:length(paths)
+            if length(splitted[idx]) < first_different_dir_idx || splitted[1][first_different_dir_idx] != splitted[idx][first_different_dir_idx]
+                found_different = true
+                break
+            end
+        end
+        if found_different
+            break
+        end
+    end
+
+    if first_different_dir_idx == 1
+        return nothing
+    end
+
+    return joinpath(splitted[1][1:first_different_dir_idx-1])
+
+end
