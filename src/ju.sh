@@ -39,9 +39,9 @@ ju()
   fi
 
         if [ -f ${projectdir}/JuliaSysimage.so ]; then
-                julia --project=$projectdir --banner=no --color=yes -t auto -O3 --sysimage ${projectdir}/JuliaSysimage.so $@
+                julia --project=$projectdir --banner=no --color=yes -t auto,auto -O3 --sysimage ${projectdir}/JuliaSysimage.so $@
         else
-                julia --project=$projectdir --banner=no --color=yes -t auto -O3 $@
+                julia --project=$projectdir --banner=no --color=yes -t auto,auto -O3 $@
         fi
 }
 
