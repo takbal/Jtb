@@ -89,12 +89,12 @@ function PlotlyJS.Plot(data::KeyedArray, lo::Layout = Layout(); kwargs...)
     lo, datakeys = _prepare_plotting(lo, data)
 
     if ndims(data) == 1
-        trace = GenericTrace(datakeys[1], parent(parent(data)); kwargs...)
+        trace = GenericTrace(datakeys[1], unwrap(data); kwargs...)
         PlotlyJS.Plot(trace, lo)
     elseif ndims(data) == 2
 
         traces = [ GenericTrace(datakeys[1], x; name = datakeys[2][idx], kwargs...)
-                   for (idx,x) in enumerate(eachslice(data, dims=2)) ]
+                   for (idx,x) in enumerate(eachslice(unwrap(data), dims=2)) ]
         return PlotlyJS.Plot(traces, lo)
 
     else
