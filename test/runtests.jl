@@ -1,4 +1,4 @@
-using Test, Jtb, Dates, AxisKeys, Random
+using Test, Jtb, Dates, AxisKeys, Random, Parameters
 
 Random.seed!(123456)
 
@@ -88,13 +88,54 @@ end
     @test isequal( timedatemat, wrapdims([1 2 ; 4 5 ], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,2);Date(2022,1,4)]))
 end
 
-@testset "parexec" begin    
-    function foo(; bar, foobar)
-        return bar, foobar
+@with_kw mutable struct JtbParamsTest1 <: AbstractParameters
+    a::Int = 6
+    b::Float64 = -1.1
+    c::Symbol
+end
+
+@with_kw mutable struct JtbParamsTest2 <: AbstractParameters
+    target::Int = 0
+end
+
+@testset "parexec" begin
+
+    basedir = mktempdir()
+
+    test_params = JtbParamsTest1(c = :foobar)
+
+    function Base.:(==)(x::JtbParamsTest1, y::JtbParamsTest1)
+        return x.a == y.a && x.b == y.b && x.c == y.c
     end
-    outputs, params = parexec(foo; bar=[1,2], foobar=[true, false])
-    @test isequal( outputs, Any[(1, true), (2, true), (1, false), (2, false)] )
-    @test isequal( params, Dict{Symbol, Integer}[Dict(:foobar => true, :bar => 1), Dict(:foobar => true, :bar => 2), Dict(:foobar => false, :bar => 1), Dict(:foobar => false, :bar => 2)] )
+
+    @test isequal( sweep_parameters(test_params; c = [:foo, :bar] ), [ JtbParamsTest1(c = :foo), JtbParamsTest1(c = :bar) ] )
+
+    function foo_v1(p, dir, pr)
+        x = 0
+        for i = 1:p.target
+            sleep(1)
+            x += 1
+            @info "x is now $x"
+            pr(i/p.target)
+
+            if p.target == 3
+                @assert false "test error"
+            end
+    
+        end
+
+        open(joinpath( dir, "foo.txt"), "w") do file
+            write(file, string(x))
+        end
+    
+        return x
+    end
+
+    results, output_dirs, failed = parexec(foo_v1, sweep_parameters( JtbParamsTest2(); target = [1,2,3,4] );
+                                    basedir = mktempdir(), force = true, progress_freq_sec = Inf, print_log_of_failed_jobs = false)
+    @test isequal( results, [1,2,nothing,4] )
+    @test isequal( failed, [3] )
+    
 end
 
 @testset "files" begin
