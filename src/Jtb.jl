@@ -40,10 +40,10 @@ include("stats.jl")
 export fractiles
 
 include("files.jl")
-export getdir
+export getdir, get_common_path_prefix
 
 include("parexec.jl")
-export parexec
+export AbstractParameters, sweep_parameters, parexec
 
 
 using Pkg
