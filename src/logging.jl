@@ -31,7 +31,8 @@ Generate a string that contains the stacktrace in a catch.
 This works with file logging, unlike exception=(err,st).
 Use it like:
 
-...
+try
+    ...
 catch err
     @error withtrace(err, "problem") or
     @warning withtrace(err, "problem")
