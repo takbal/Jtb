@@ -1,4 +1,4 @@
-using Test, Jtb, Dates, AxisKeys, Random, Parameters
+using Test, Jtb, Dates, AxisKeys, Random
 
 Random.seed!(123456)
 
