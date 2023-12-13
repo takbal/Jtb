@@ -1,8 +1,8 @@
-using JLD2, Logging, LoggingExtras, Dates, Parameters, ProgressMeter
+using JLD2, Logging, LoggingExtras, Dates, ProgressMeter
 
 """
     A type assumed to have parameters as properties.
-    Typically, such types are created through @with_kw of Parameters.jl.
+    Typically, such types are created through @kwdef or @with_kw of Parameters.jl.
 """
 abstract type AbstractParameters end
 

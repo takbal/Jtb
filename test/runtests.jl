@@ -88,13 +88,13 @@ end
     @test isequal( timedatemat, wrapdims([1 2 ; 4 5 ], times=[Time(9,00);Time(10,00)], dates=[Date(2022,1,2);Date(2022,1,4)]))
 end
 
-@with_kw mutable struct JtbParamsTest1 <: AbstractParameters
+@kwdef mutable struct JtbParamsTest1 <: AbstractParameters
     a::Int = 6
     b::Float64 = -1.1
     c::Symbol
 end
 
-@with_kw mutable struct JtbParamsTest2 <: AbstractParameters
+@kwdef mutable struct JtbParamsTest2 <: AbstractParameters
     target::Int = 0
 end
 
