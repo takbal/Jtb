@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.3.8 (2023-12-13)
+
+#### New Features
+
+* updated to 1.9
+* parexec tests
+* parexec tool for threaded execution with repo, progress, logging, parameter sweeps
+* added files unit test
+* added get_common_path_prefix()
+* sample parquet for images
+* added Parquet image command
+#### Fixes
+
+* removed Parameters dependency
+* removed Params dependency, using @kwdefs
+* KeyedArray matrices plotting
+* image commands
+* propfill for 1-dimensional arrays
+
+Full set of changes: [`0.3.7...0.3.8`](git@10.10.10.3:Jtb.git/compare/0.3.7...0.3.8)
+
 ## 0.3.7 (2023-09-06)
 
 #### New Features
