@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.9 (2024-01-02)
+
+#### New Features
+
+* updated packages
+
+Full set of changes: [`0.3.8...0.3.9`](git@10.10.10.3:Jtb.git/compare/0.3.8...0.3.9)
+
 ## 0.3.8 (2023-12-13)
 
 #### New Features
