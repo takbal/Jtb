@@ -52,7 +52,7 @@ $ ju ProjectName [parameters]
 
 In zsh, the ProjectName can be expanded automatically by hitting tab. `ju` or `ju .` will start the environment found in the current directory, or the global one if none found.
 
-5. Edit the project template below `$HOME/.julia/environments/mkj/template` to your liking.
+5. Edit the new project template below `$HOME/.julia/environments/mkj/template` to your liking. The content of this directory is going to be copied into each new project. The `mkj.toml` template contains further detailed explanations about its parameters in its comments, that are going to be removed for instantiated projects.
 
 # Local registries
 
