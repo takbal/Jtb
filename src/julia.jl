@@ -183,3 +183,19 @@ function get_field_sizes(v; tabsize = 0)
     end
 
 end
+
+
+"""
+    gc_if(;takenGB::Float64 = Inf, freeGB::Float64 = 0.)
+
+Trigger garbage collection if total memory taken is higher than 'takenGB', or 
+free memory is less than 'freeGB' in megabytes.
+
+Manual GC triggers seems essential in multi-threaded code, as julia seems to
+be clueless when to do it.
+"""
+function gc_if(takenGB::Float64 = Inf, freeGB::Float64 = 0.)
+    if Sys.maxrss() / 2^30 > takenGB || Sys.free_memory() / 2^30 < freeGB
+        GC.gc()
+    end
+end
