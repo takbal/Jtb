@@ -45,6 +45,8 @@ export getdir, get_common_path_prefix
 include("parexec.jl")
 export AbstractParameters, sweep_parameters, parexec
 
+include("mt.jl")
+export @sp
 
 using Pkg
 
