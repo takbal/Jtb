@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.10 (2025-03-12)
+
+#### New Features
+
+* added @sp macro that allows clearing thread state
+* added gc_if (conditional GC)
+
+Full set of changes: [`0.3.9...0.3.10`](git@10.10.10.3:Jtb.git/compare/0.3.9...0.3.10)
+
 ## 0.3.9 (2024-01-02)
 
 #### New Features
