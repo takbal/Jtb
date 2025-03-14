@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.11 (2025-03-12)
+
+
+Full set of changes: [`0.3.10...0.3.11`](git@10.10.10.3:Jtb.git/compare/0.3.10...0.3.11)
+
 ## 0.3.10 (2025-03-12)
 
 #### New Features
