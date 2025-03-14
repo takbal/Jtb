@@ -19,7 +19,7 @@ It installs its stuff in a private environment below `$HOME/.julia/environments/
 ```
 $ julia
 julia> using Pkg
-julia> Pkg.activate(;tmp=true)
+julia> Pkg.activate(;temp=true)
 julia> Pkg.add("Jtb")
 julia> using Jtb
 julia> Jtb.install_mkj()

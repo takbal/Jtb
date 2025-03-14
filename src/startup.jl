@@ -1,6 +1,8 @@
-# include or copy this file (or merge with existing) below ~/.julia/config/startup.jl for using / compiled in mkj.jl to work
+0# include or copy this file (or merge with existing) below ~/.julia/config/startup.jl for using / compiled in mkj.jl to work
 
 ENV["JULIA_EDITOR"] = "code"
+
+import Pkg
 
 atreplinit() do repl
 
@@ -8,8 +10,6 @@ atreplinit() do repl
     if repl.options.tabwidth == 8
         repl.options.tabwidth = 7
                 
-        @eval using Pkg
-
         project_file = Base.active_project()
         project_dir = dirname(project_file)
         manifest_file = joinpath( project_dir, "Manifest.toml")
@@ -69,4 +69,3 @@ atreplinit() do repl
         end
     end
 end
-
