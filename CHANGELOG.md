@@ -1,9 +1,12 @@
 # Changelog
 
-## 0.3.11 (2025-03-12)
+## 0.3.12 (2025-03-15)
 
+#### New Features
 
-Full set of changes: [`0.3.10...0.3.11`](git@10.10.10.3:Jtb.git/compare/0.3.10...0.3.11)
+* update to 1.11.4
+
+Full set of changes: [`0.3.10...0.3.12`](https://github.com/takbal/Jtb/compare/0.3.10...0.3.12)
 
 ## 0.3.10 (2025-03-12)
 
@@ -12,7 +15,7 @@ Full set of changes: [`0.3.10...0.3.11`](git@10.10.10.3:Jtb.git/compare/0.3.10..
 * added @sp macro that allows clearing thread state
 * added gc_if (conditional GC)
 
-Full set of changes: [`0.3.9...0.3.10`](git@10.10.10.3:Jtb.git/compare/0.3.9...0.3.10)
+Full set of changes: [`0.3.9...0.3.10`](https://github.com/takbal/Jtb/compare/0.3.9...0.3.10)
 
 ## 0.3.9 (2024-01-02)
 
@@ -20,7 +23,7 @@ Full set of changes: [`0.3.9...0.3.10`](git@10.10.10.3:Jtb.git/compare/0.3.9...0
 
 * updated packages
 
-Full set of changes: [`0.3.8...0.3.9`](git@10.10.10.3:Jtb.git/compare/0.3.8...0.3.9)
+Full set of changes: [`0.3.8...0.3.9`](https://github.com/takbal/Jtb/compare/0.3.8...0.3.9)
 
 ## 0.3.8 (2023-12-13)
 
@@ -41,7 +44,7 @@ Full set of changes: [`0.3.8...0.3.9`](git@10.10.10.3:Jtb.git/compare/0.3.8...0.
 * image commands
 * propfill for 1-dimensional arrays
 
-Full set of changes: [`0.3.7...0.3.8`](git@10.10.10.3:Jtb.git/compare/0.3.7...0.3.8)
+Full set of changes: [`0.3.7...0.3.8`](https://github.com/takbal/Jtb/compare/0.3.7...0.3.8)
 
 ## 0.3.7 (2023-09-06)
 
@@ -55,7 +58,7 @@ Full set of changes: [`0.3.7...0.3.8`](git@10.10.10.3:Jtb.git/compare/0.3.7...0.
 
 * initial check-in for new projects
 
-Full set of changes: [`0.3.6...0.3.7`](git@10.10.10.3:Jtb.git/compare/0.3.6...0.3.7)
+Full set of changes: [`0.3.6...0.3.7`](https://github.com/takbal/Jtb/compare/0.3.6...0.3.7)
 
 ## 0.3.6 (2023-05-28)
 
@@ -68,7 +71,7 @@ Full set of changes: [`0.3.6...0.3.7`](git@10.10.10.3:Jtb.git/compare/0.3.6...0.
 
 * non-recursive without join
 
-Full set of changes: [`0.3.5...0.3.6`](git@10.10.10.3:Jtb.git/compare/0.3.5...0.3.6)
+Full set of changes: [`0.3.5...0.3.6`](https://github.com/takbal/Jtb/compare/0.3.5...0.3.6)
 
 ## 0.3.5 (2023-05-03)
 
@@ -77,7 +80,7 @@ Full set of changes: [`0.3.5...0.3.6`](git@10.10.10.3:Jtb.git/compare/0.3.5...0.
 * trace_fractile: added log for Y stds
 * added forced symbol parsing
 
-Full set of changes: [`0.3.4...0.3.5`](git@10.10.10.3:Jtb.git/compare/0.3.4...0.3.5)
+Full set of changes: [`0.3.4...0.3.5`](https://github.com/takbal/Jtb/compare/0.3.4...0.3.5)
 
 ## 0.3.4 (2023-04-21)
 
@@ -85,7 +88,7 @@ Full set of changes: [`0.3.4...0.3.5`](git@10.10.10.3:Jtb.git/compare/0.3.4...0.
 
 * ensure readd dev packages
 
-Full set of changes: [`0.3.3...0.3.4`](git@10.10.10.3:Jtb.git/compare/0.3.3...0.3.4)
+Full set of changes: [`0.3.3...0.3.4`](https://github.com/takbal/Jtb/compare/0.3.3...0.3.4)
 
 ## 0.3.3 (2023-04-11)
 
@@ -94,7 +97,7 @@ Full set of changes: [`0.3.3...0.3.4`](git@10.10.10.3:Jtb.git/compare/0.3.3...0.
 * added the ability to add repos after creation
 * moved files into mkj project; installation script
 
-Full set of changes: [`0.3.2...0.3.3`](git@10.10.10.3:Jtb.git/compare/0.3.2...0.3.3)
+Full set of changes: [`0.3.2...0.3.3`](https://github.com/takbal/Jtb/compare/0.3.2...0.3.3)
 
 ## 0.3.2 (2023-04-09)
 
@@ -102,7 +105,7 @@ Full set of changes: [`0.3.2...0.3.3`](git@10.10.10.3:Jtb.git/compare/0.3.2...0.
 
 * register command: allow registering at any registry
 
-Full set of changes: [`0.3.1...0.3.2`](git@10.10.10.3:Jtb.git/compare/0.3.1...0.3.2)
+Full set of changes: [`0.3.1...0.3.2`](https://github.com/takbal/Jtb/compare/0.3.1...0.3.2)
 
 ## 0.3.1 (2023-04-07)
 
@@ -120,7 +123,7 @@ Full set of changes: [`0.3.1...0.3.2`](git@10.10.10.3:Jtb.git/compare/0.3.1...0.
 * plotting export
 * gitlab repo
 
-Full set of changes: [`0.3.0...0.3.1`](git@10.10.10.3:Jtb.git/compare/0.3.0...0.3.1)
+Full set of changes: [`0.3.0...0.3.1`](https://github.com/takbal/Jtb/compare/0.3.0...0.3.1)
 
 ## 0.3.0 (2023-03-09)
 
@@ -129,38 +132,3 @@ Full set of changes: [`0.3.0...0.3.1`](git@10.10.10.3:Jtb.git/compare/0.3.0...0.
 * overhaul to match changes in mkj
 * shell function to call julia
 * large overhaul of mkj. Moved into mkj.toml all config
-
-Full set of changes: [`0.2.3...0.3.0`](git@10.10.10.3:Jtb.git/compare/0.2.3...0.3.0)
-
-## 0.2.3 (2023-02-18)
-
-
-Full set of changes: [`0.2.2...0.2.3`](git@10.10.10.3:Jtb.git/compare/0.2.2...0.2.3)
-
-## 0.2.2 (2022-10-22)
-
-
-Full set of changes: [`0.2.1...0.2.2`](git@10.10.10.3:Jtb.git/compare/0.2.1...0.2.2)
-
-## 0.2.1 (2022-10-22)
-
-
-Full set of changes: [`0.2.0...0.2.1`](git@10.10.10.3:Jtb.git/compare/0.2.0...0.2.1)
-
-## 0.2.0 (2022-03-03)
-
-
-Full set of changes: [`0.1.2...0.2.0`](git@10.10.10.3:Jtb.git/compare/0.1.2...0.2.0)
-
-## 0.1.2 (2021-02-10)
-
-
-Full set of changes: [`0.1.1...0.1.2`](git@10.10.10.3:Jtb.git/compare/0.1.1...0.1.2)
-
-## 0.1.1 (2021-01-14)
-
-
-Full set of changes: [`0.1.0...0.1.1`](git@10.10.10.3:Jtb.git/compare/0.1.0...0.1.1)
-
-## 0.1.0 (2021-01-14)
-
