@@ -33,6 +33,3 @@ UniqueVectors = "2fbcfb34-fd0c-5fbb-b5d7-e826d8f5b0a9"
 WebIO = "0f1e0344-ec1d-5b48-a673-e5cf874b6c29"
 
 [compat]
-BenchmarkTools = "1.6.0"
-Revise = "3.7.2"
-Test = "1.11.0"
