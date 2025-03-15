@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.15 (2025-03-15)
+
+
+Full set of changes: [`0.3.14...0.3.15`](https://github.com/takbal/Jtb/compare/0.3.14...0.3.15)
+
 ## 0.3.14 (2025-03-15)
 
 
