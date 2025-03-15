@@ -9,9 +9,7 @@ packages = []
 exclude = ["Atom", "Test"]
 
 [local_registry]
-name = "{user}"
-remote_git_server = "localhost"
-use = true
+name = ""
 
 [compiled]
 modules = ["Base", "Base.BaseDocs", "Base.BinaryPlatforms", "Base.BinaryPlatforms.CPUID", "Base.Broadcast", "Base.Cartesian", "Base.Checked", "Base.CoreLogging", "Base.Docs", "Base.Enums", "Base.Experimental", "Base.FastMath", "Base.Filesystem", "Base.GC", "Base.GMP", "Base.GMP.MPQ", "Base.GMP.MPZ", "Base.IRShow", "Core.Compiler", "Core.Compiler.CoreDocs", "Core.Compiler.EscapeAnalysis", "Core.Compiler.Iterators", "Core.Compiler.Order", "Core.Compiler.Timings", "Base.Iterators", "Base.IteratorsMD", "Base.Libc", "Base.Libc.Libdl", "Base.Linking", "Base.MPFR", "Base.MainInclude", "Base.Math", "Base.MathConstants", "Base.Meta", "Base.Multimedia", "Base.MultiplicativeInverses", "Base.Order", "Base.PCRE", "Base.Partr", "Base.PermutedDimsArrays", "Base.Rounding", "Base.Ryu", "Base.SimdLoop", "Base.Sort", "Base.StackTraces", "Base.Sys", "Base.TOML", "Base.Threads", "Base.Unicode", "Base._RepeatInnerOuter", "Base.__toplevel__"]
