@@ -2,7 +2,7 @@
 
 julia_version = "1.11.4"
 manifest_format = "2.0"
-project_hash = "0c7ea0b83a53d790f1f1d7d38161a5cd0fdbd8f6"
+project_hash = "b6a6e9b2938edbb2129f25197bcf266ae3edde26"
 
 [[deps.AcceleratedArrays]]
 deps = ["Dictionaries", "SplitApplyCombine"]
